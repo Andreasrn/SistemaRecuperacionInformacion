@@ -52,5 +52,28 @@ public abstract class HTMLFilter {
         }
 
     }
+    
+    /**
+     * Deletes the DOCTYPE part of an HTML file
+     * @param path File whose doctype part will be removed
+     */
+    public static void removeDoctype(String path){
+         String fileName = path.substring(10);
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(path)));
+            PrintWriter printer = new PrintWriter(new FileWriter("documents\\" + "NOTAG" + fileName));
+            String line = br.readLine();
+            
+            while (line != null) {
+                if (!line.contains("<!DOCTYPE")) {
+                    printer.println(line);
+                }
+                line = br.readLine();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

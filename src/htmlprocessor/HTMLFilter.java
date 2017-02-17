@@ -58,7 +58,7 @@ public abstract class HTMLFilter {
      * @param path File whose doctype part will be removed
      */
     public static void removeDoctype(String path){
-         String fileName = path.substring(10);
+        String fileName = path.substring(10);
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(path)));
@@ -69,6 +69,50 @@ public abstract class HTMLFilter {
                 if (!line.contains("<!DOCTYPE")) {
                     printer.println(line);
                 }
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void printFile(String path) throws IOException{
+
+            BufferedReader br = new BufferedReader(new FileReader(new File(path)));
+            String line = br.readLine();
+            
+            while (line != null) {
+                System.out.println(line);
+                line = br.readLine();
+            }
+    }
+    
+    /**
+     * Keeps only the content in body tag
+     * @param path path of the file
+     */
+    public static void removeAllButBody(String path){
+        String fileName = path.substring(10);
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(path)));
+            PrintWriter printer = new PrintWriter(new FileWriter("documents\\" + "NEW-" + fileName));
+            
+            Boolean deleteContent = true;
+            String line = br.readLine();
+                                
+            while (line != null) {
+                if (line.startsWith("<body")) {
+                    deleteContent = false;
+                } else if (line.equals("</body>")) {
+                    deleteContent = true;       
+                }
+
+                if (!deleteContent && !line.contains("<body")) {
+                    printer.flush();
+                    printer.println(line);
+                }
+
                 line = br.readLine();
             }
         } catch (Exception e) {

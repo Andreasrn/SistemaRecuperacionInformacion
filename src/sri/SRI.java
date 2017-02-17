@@ -5,6 +5,9 @@
  */
 package sri;
 
+import htmlprocessor.HTMLFilter;
+import java.io.IOException;
+
 /**
  *
  * @author Andrea
@@ -14,8 +17,7 @@ public class SRI {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public static void main(String[] args) throws IOException {
+        HTMLFilter.removeHead("documents/es_43719.html");
     }
-    
 }

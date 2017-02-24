@@ -41,6 +41,7 @@ public class SRI {
         int numFiles = 0;
         Stopper stopper = new Stopper();
         int totalTokensAfter = 0;
+        int minTokensBe = 9999, maxTokensBe = 0, minTokensAf = 9999, maxTokensAf = 0;
 
 
         /*******************************************************************************/
@@ -92,8 +93,14 @@ public class SRI {
             }
 
             text = sb.toString();
+            int tokens = StringUtils.countMatches(text,"\n");
+
+            if (tokens < minTokensBe) minTokensBe = tokens;
+            if (tokens > maxTokensBe) maxTokensBe = tokens;
+
+
             FileUtils.writeStringToFile(archive, text, "UTF-8");
-            totalTokensBefore += StringUtils.countMatches(text,"\n");
+            totalTokensBefore += tokens;
         }
 
         ArrayList<String> mostFreqBe = mostFrequentWords("processed");
@@ -109,7 +116,19 @@ public class SRI {
             File archive = new File( folder2.getPath() + '/' + file.getName());
             FileUtils.writeStringToFile(archive, text, "UTF-8");
 
-            totalTokensAfter += StringUtils.countMatches(text, "\n");
+            StringUtils.removeAll(text,"\0");
+            StringBuilder sb = new StringBuilder(text);
+
+            for (int i = 1; i < sb.length(); i++){
+                if (sb.charAt(i) == '\n' && sb.charAt(i-1) == 32) sb.deleteCharAt(i);
+            }
+
+            text = sb.toString();
+            int tokens = StringUtils.countMatches(text,"\n");
+
+            if (tokens < minTokensAf) minTokensAf = tokens;
+            if (tokens > maxTokensAf) maxTokensAf = tokens;
+            totalTokensAfter += tokens;
         }
         ArrayList<String> mostFreqAf = mostFrequentWords("stopper");
 
@@ -125,11 +144,17 @@ public class SRI {
         System.out.printf("Total tokens obtained before applying Stopper: %s\nAverage tokens per file before applying Stopper: %s\n", totalTokensBefore, tokensPerFileBefore);
         System.out.printf("Total tokens obtained after applying Stopper: %s\nAverage tokens per file after applying Stopper: %s\n", totalTokensAfter, tokensPerFileAfter);
 
-        System.out.print("Most frequent words before applying Stopper: \n");
+        System.out.print("Most frequent words before applying Stopper: ");
         for (String word: mostFreqBe) System.out.print(word+" ");
 
-        System.out.print("Most frequent words after applying Stopper: \n");
+        System.out.println();
+
+        System.out.print("Most frequent words after applying Stopper: ");
         for (String word: mostFreqAf) System.out.print(word+" ");
+        System.out.println();
+
+        System.out.printf("Max tokens contained in a document before processing: %s\nMin tokens contained in a document before processing: %s\n", maxTokensBe, minTokensBe);
+        System.out.printf("Max tokens contained in a document after processing: %s\nMin tokens contained in a document after processing: %s\n", maxTokensAf, minTokensAf);
     }
 
     /**

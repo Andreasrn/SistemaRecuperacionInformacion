@@ -101,6 +101,8 @@ public class SRI {
             totalTokensAfter += StringUtils.countMatches(text, "\n");
         }
 
+        tokensPerFileAfter = (float) totalTokensAfter / numFiles;
+
         time_end = System.currentTimeMillis() - time_start;
         System.out.println("Processing finished. You can find the new files in ./stopper folder. Exiting...");
 
@@ -109,7 +111,7 @@ public class SRI {
         tokensPerFileBefore = (float) totalTokensBefore / numFiles;
         System.out.println("Total time of processing (including I/O operations): "+ time_end / 1000.0 + " seconds.");
         System.out.printf("Total tokens obtained before applying Stopper: %s\nAverage tokens per file before applying Stopper: %s\n", totalTokensBefore, tokensPerFileBefore);
-        System.out.printf("Total tokens obtained after applying Stopper: %s\n", totalTokensAfter);
+        System.out.printf("Total tokens obtained after applying Stopper: %s\nAverage tokens per file after applying Stopper: %s\n", totalTokensAfter, tokensPerFileAfter);
 
     }
 

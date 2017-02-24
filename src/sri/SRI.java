@@ -82,9 +82,18 @@ public class SRI {
             text = HTMLProcessor.process(file.getPath());
 
             File archive = new File(folder.getPath() + '/' + file.getName());
-            FileUtils.writeStringToFile(archive, text, "UTF-8");
 
-            totalTokensBefore += StringUtils.countMatches(text,"\n"); //There are extra \n -> I have to fix it
+
+            StringUtils.removeAll(text,"\0");
+            StringBuilder sb = new StringBuilder(text);
+
+            for (int i = 1; i < sb.length(); i++){
+                if (sb.charAt(i) == '\n' && sb.charAt(i-1) == 32) sb.deleteCharAt(i);
+            }
+
+            text = sb.toString();
+            FileUtils.writeStringToFile(archive, text, "UTF-8");
+            totalTokensBefore += StringUtils.countMatches(text,"\n");
         }
 
         ArrayList<String> mostFreqBe = mostFrequentWords("processed");

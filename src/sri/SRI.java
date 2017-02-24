@@ -87,6 +87,8 @@ public class SRI {
             totalTokensBefore += StringUtils.countMatches(text,"\n"); //There are extra \n -> I have to fix it
         }
 
+        ArrayList<String> mostFreqBe = mostFrequentWords("processed");
+
         File folder2 = new File("stopper");
         if (!folder2.exists()) folder.mkdir();
         else FileUtils.cleanDirectory(folder2);
@@ -100,6 +102,7 @@ public class SRI {
 
             totalTokensAfter += StringUtils.countMatches(text, "\n");
         }
+        ArrayList<String> mostFreqAf = mostFrequentWords("stopper");
 
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;
 
@@ -113,6 +116,11 @@ public class SRI {
         System.out.printf("Total tokens obtained before applying Stopper: %s\nAverage tokens per file before applying Stopper: %s\n", totalTokensBefore, tokensPerFileBefore);
         System.out.printf("Total tokens obtained after applying Stopper: %s\nAverage tokens per file after applying Stopper: %s\n", totalTokensAfter, tokensPerFileAfter);
 
+        System.out.print("Most frequent words before applying Stopper: \n");
+        for (String word: mostFreqBe) System.out.print(word+" ");
+
+        System.out.print("Most frequent words after applying Stopper: \n");
+        for (String word: mostFreqAf) System.out.print(word+" ");
     }
 
     /**
@@ -120,9 +128,9 @@ public class SRI {
      * @param path path where the documents are stored
      * @return array with the most frequent words
      */
-    private ArrayList mostFrequentWords(String path) throws IOException {
+    private static ArrayList mostFrequentWords(String path) throws IOException {
         PriorityQueue<Map.Entry> listOfWords = new PriorityQueue<>(10,(o1, o2) -> {
-            return ((int) o1.getValue() - (int) o2.getValue());
+            return ((int) o2.getValue() - (int) o1.getValue());
         });
 
         HashMap<String,Integer> mapOfWords = new HashMap<>();
@@ -150,7 +158,7 @@ public class SRI {
         }
 
         for (int i = 0; i < 5; i++){
-            outputList.add(listOfWords.poll());
+            outputList.add(listOfWords.poll().getKey());
         }
 
         return outputList;

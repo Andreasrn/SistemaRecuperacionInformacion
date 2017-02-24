@@ -55,7 +55,7 @@ public abstract class HTMLProcessor {
             
             word = StringUtils.stripAccents(word);        
             
-            word = word.replaceAll("[^a-z0-9-_\\n]", "");
+            word = word.replaceAll("[^a-z0-9-_\\n]", " ");
             
             outputText += word + '\n';
         }

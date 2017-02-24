@@ -84,17 +84,32 @@ public class SRI {
             File archive = new File(folder.getPath() + '/' + file.getName());
             FileUtils.writeStringToFile(archive, text, "UTF-8");
 
-            totalTokensBefore += StringUtils.countMatches(text,"\n");
+            totalTokensBefore += StringUtils.countMatches(text,"\n"); //There are extra \n -> I have to fix it
+        }
+
+        File folder2 = new File("stopper");
+        if (!folder2.exists()) folder.mkdir();
+        else FileUtils.cleanDirectory(folder2);
+
+        listOfDocuments = folder.listFiles();
+        for (File file: listOfDocuments){
+            text = stopper.deleteEmptyWords(file.getPath());
+
+            File archive = new File( folder2.getPath() + '/' + file.getName());
+            FileUtils.writeStringToFile(archive, text, "UTF-8");
+
+            totalTokensAfter += StringUtils.countMatches(text, "\n");
         }
 
         time_end = System.currentTimeMillis() - time_start;
-        System.out.println("Processing finished. You can find the new files in ./processed folder. Exiting...");
+        System.out.println("Processing finished. You can find the new files in ./stopper folder. Exiting...");
 
         System.out.println("########################## STATS ##############################");
 
         tokensPerFileBefore = (float) totalTokensBefore / numFiles;
         System.out.println("Total time of processing (including I/O operations): "+ time_end / 1000.0 + " seconds.");
-        System.out.printf("Total tokens obtained before applying Stopper: %s\nAverage tokens per file before applying Stopper: %s", totalTokensBefore, tokensPerFileBefore);
+        System.out.printf("Total tokens obtained before applying Stopper: %s\nAverage tokens per file before applying Stopper: %s\n", totalTokensBefore, tokensPerFileBefore);
+        System.out.printf("Total tokens obtained after applying Stopper: %s\n", totalTokensAfter);
 
     }
 

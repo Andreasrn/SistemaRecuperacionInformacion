@@ -1,7 +1,10 @@
 package htmlprocessor;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.TreeSet;
+
+import static java.awt.SystemColor.text;
 
 /**
  * Created by Andrea on 24/02/2017.
@@ -25,16 +28,17 @@ public class Stopper {
     }
 
     /**
-     * Given a text, this function returns the same text without empty words
-     * @param text text which will be processed
+     * Given a file, this function returns its text without empty words
+     * @param path path of the file which will be processed
      * @return text free of empty words
      */
-    public String deleteEmptyWords(String text){
+    public String deleteEmptyWords(String path) throws IOException {
         String outputText = "";
+        BufferedReader br = new BufferedReader(new FileReader(new File (path)));
 
-        String[] listOfWords = text.split("\n");
-
-        for (String word: listOfWords){
+        ArrayList<String> listOfWords = new ArrayList<>();
+        String word;
+        while ( (word = br.readLine()) != null ){
             if (!emptyWords.contains(word)) outputText += word + "\n";
         }
 

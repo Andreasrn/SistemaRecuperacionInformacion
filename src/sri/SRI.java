@@ -5,14 +5,16 @@
  */
 package sri;
 
+import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import htmlprocessor.HTMLProcessor;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
+import htmlprocessor.Stopper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 
 
@@ -32,9 +34,14 @@ public class SRI {
         String documentsPath = "documents";
         Scanner keyboard = new Scanner(System.in);
         String option;
-        int totalTokens = 0;
-        float tokensPerFile = 0;
+        int totalTokensBefore = 0;
+        float tokensPerFileBefore = 0;
+        float tokensPerFileAfter = 0;
+        String[] mostFrequentWordsBefore, mostFrequentWordsAfter;
         int numFiles = 0;
+        Stopper stopper = new Stopper();
+        int totalTokensAfter = 0;
+
 
         /*******************************************************************************/
 
@@ -73,18 +80,29 @@ public class SRI {
         System.out.println("Processing documents...");
         for (File file: listOfDocuments) {
             text = HTMLProcessor.process(file.getPath());
+            //text = stopper.deleteEmptyWords(text);
+
             File archive = new File(folder.getPath() + '/' + file.getName());
             FileUtils.writeStringToFile(archive, text, "UTF-8");
 
-            totalTokens += StringUtils.countMatches(text,"\n");
+            totalTokensBefore += StringUtils.countMatches(text,"\n");
         }
 
         time_end = System.currentTimeMillis() - time_start;
         System.out.println("Processing finished. You can find the new files in ./processed folder. Exiting...");
 
-        tokensPerFile = (float) totalTokens / numFiles;
+        tokensPerFileBefore = (float) totalTokensBefore / numFiles;
         System.out.println("Total time of processing (including I/O operations): "+ time_end / 1000.0 + " seconds.");
-        System.out.printf("Total tokens obtained: %s\nAverage tokens per file: %s", totalTokens, tokensPerFile);
+        System.out.printf("Total tokens obtained: %s\nAverage tokens per file: %s", totalTokensBefore, tokensPerFileBefore);
 
+    }
+
+    /**
+     * Returns the 5 most frequent words in a given collection
+     * @param path path where the documents are stored
+     * @return array with the most frequent words
+     */
+    private String[] mostFrequentWords(String path) throws IOException {
+        return null;
     }
 }

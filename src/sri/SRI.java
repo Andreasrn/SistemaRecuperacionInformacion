@@ -102,7 +102,44 @@ public class SRI {
      * @param path path where the documents are stored
      * @return array with the most frequent words
      */
-    private String[] mostFrequentWords(String path) throws IOException {
-        return null;
+    private ArrayList mostFrequentWords(String path) throws IOException {
+        PriorityQueue<Map.Entry> listOfWords = new PriorityQueue<>(10,(o1, o2) -> {
+            return ((int) o1.getValue() - (int) o2.getValue());
+        });
+
+        HashMap<String,Integer> mapOfWords = new HashMap<>();
+
+        BufferedReader br;
+        String word;
+        ArrayList outputList = new ArrayList();
+
+        File[] listOfFiles = new File(path).listFiles();
+
+        for (File file: listOfFiles){
+            br = new BufferedReader(new FileReader(file));
+
+            while ( (word = br.readLine()) != null) {
+                if (mapOfWords.containsKey(word)) {
+                    mapOfWords.put(word, mapOfWords.get(word) + 1);
+                } else {
+                    mapOfWords.put(word, 1);
+                }
+            }
+        }
+
+        for (Map.Entry entry: mapOfWords.entrySet()){
+            listOfWords.offer(entry);
+        }
+
+        for (int i = 0; i < 5; i++){
+            outputList.add(listOfWords.poll());
+        }
+
+        return outputList;
+
+
+
+
+
     }
 }

@@ -60,7 +60,7 @@ public class SRI {
 
         File documents = new File(documentsPath);
         if (!documents.exists()){
-            System.out.println("The folder "+documentsPath+" doesn't exist. Exiting...");
+            System.out.println("Folder "+documentsPath+" doesn't exist. Exiting...");
             System.exit(0);
         }
 
@@ -80,7 +80,6 @@ public class SRI {
         System.out.println("Processing documents...");
         for (File file: listOfDocuments) {
             text = HTMLProcessor.process(file.getPath());
-            //text = stopper.deleteEmptyWords(text);
 
             File archive = new File(folder.getPath() + '/' + file.getName());
             FileUtils.writeStringToFile(archive, text, "UTF-8");
@@ -91,9 +90,11 @@ public class SRI {
         time_end = System.currentTimeMillis() - time_start;
         System.out.println("Processing finished. You can find the new files in ./processed folder. Exiting...");
 
+        System.out.println("########################## STATS ##############################");
+
         tokensPerFileBefore = (float) totalTokensBefore / numFiles;
         System.out.println("Total time of processing (including I/O operations): "+ time_end / 1000.0 + " seconds.");
-        System.out.printf("Total tokens obtained: %s\nAverage tokens per file: %s", totalTokensBefore, tokensPerFileBefore);
+        System.out.printf("Total tokens obtained before applying Stopper: %s\nAverage tokens per file before applying Stopper: %s", totalTokensBefore, tokensPerFileBefore);
 
     }
 
@@ -136,9 +137,6 @@ public class SRI {
         }
 
         return outputList;
-
-
-
 
 
     }

@@ -32,7 +32,7 @@ public class Stopper {
     public String deleteEmptyWords(String text){
         String outputText = "";
 
-        String[] listOfWords = text.split(" ");
+        String[] listOfWords = text.split("\n");
 
         for (String word: listOfWords){
             if (!emptyWords.contains(word)) outputText += word + "\n";

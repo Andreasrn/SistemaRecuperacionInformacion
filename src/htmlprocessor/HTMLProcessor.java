@@ -44,7 +44,25 @@ public abstract class HTMLProcessor {
      * @return normalized text
      */
     private static String normalizeText(String text){
+
         String outputText = "";
+
+        text = text.toLowerCase();
+
+        text = StringUtils.stripAccents(text);
+
+        text = text.replaceAll("[^a-z0-9-_\\n]", " ");
+
+        String[] listOfWords = text.split("\\s+");
+
+        for (String word: listOfWords){
+            outputText += word;
+            if (!outputText.endsWith("\n")) outputText += "\n";
+        }
+
+        return outputText;
+
+       /* String outputText = "";
         
         String[] listOfWords = text.split("\\s+");
         
@@ -62,7 +80,7 @@ public abstract class HTMLProcessor {
         }
         
         
-        return outputText;
+        return outputText;*/
     }
 
     /**

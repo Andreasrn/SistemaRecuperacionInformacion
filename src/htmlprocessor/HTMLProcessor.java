@@ -62,25 +62,6 @@ public abstract class HTMLProcessor {
 
         return outputText;
 
-       /* String outputText = "";
-        
-        String[] listOfWords = text.split("\\s+");
-        
-        int charCode;
-        
-        for (String word: listOfWords){
-            word = word.toLowerCase();
-            
-            word = StringUtils.stripAccents(word);        
-            
-            word = word.replaceAll("[^a-z0-9-_\\n]", " ");
-            
-            if (!word.equals(" ")) outputText += word;
-            if (!outputText.endsWith("\n")) outputText += '\n';
-        }
-        
-        
-        return outputText;*/
     }
 
     /**

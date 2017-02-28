@@ -14,8 +14,6 @@ import java.util.*;
 import htmlprocessor.Stopper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.helper.StringUtil;
 
 
 /**
@@ -82,7 +80,7 @@ public class SRI {
         for (File file: listOfDocuments) {
             text = HTMLProcessor.process(file.getPath());
 
-            File archive = new File(folder.getPath() + '/' + file.getName());
+            File archive = new File(folder.getPath() + '/' + file.getName().replace(".html",".txt"));
 
 
             StringUtils.removeAll(text,"\0");

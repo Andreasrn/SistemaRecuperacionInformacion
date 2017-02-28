@@ -46,7 +46,7 @@ public abstract class HTMLProcessor {
     private static String normalizeText(String text){
         String outputText = "";
         
-        String[] listOfWords = text.split(" ");
+        String[] listOfWords = text.split("\\s+");
         
         int charCode;
         
@@ -57,7 +57,8 @@ public abstract class HTMLProcessor {
             
             word = word.replaceAll("[^a-z0-9-_\\n]", " ");
             
-            outputText += word + '\n';
+            if (!word.equals(" ")) outputText += word;
+            if (!outputText.endsWith("\n")) outputText += '\n';
         }
         
         

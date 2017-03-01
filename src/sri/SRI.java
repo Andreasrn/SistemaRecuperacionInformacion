@@ -29,14 +29,11 @@ public class SRI {
 
         /******************************VARIABLES DECLARATION******************************/
 
-        long time_end;
-
         String documentsPath = "documents";
 
         Scanner keyboard = new Scanner(System.in);
         String option;
         String[] mostFrequentWordsBefore, mostFrequentWordsAfter;
-        int numFiles = 0;
         Stopper stopper = new Stopper();
         int totalTokensAfter = 0;
         int totalTokensBefore = 0;
@@ -60,79 +57,62 @@ public class SRI {
             documentsPath = keyboard.nextLine();
         }
 
-        File documentsFolder = new File(documentsPath);
-
-        checkIfFolderExists(documentsFolder);
-
         long time_start = System.currentTimeMillis(); //<--------We count the time starting from here.
 
-        File folder = new File("processed");
-        if (!folder.exists()) folder.mkdir();
-        else FileUtils.cleanDirectory(folder);
+        File documentsFolder = new File(documentsPath);
+        checkIfFolderExists(documentsFolder);
 
-
+        File processedFolder = new File("processed");
+        createOrEmptyFolder(processedFolder);
 
         File[] listOfDocuments = documentsFolder.listFiles();
-        numFiles = listOfDocuments.length;
+        int numFiles = listOfDocuments.length;
+
+        System.out.println("Filtering and normalizing documents...");
 
         String text;
-        System.out.println("Processing documents...");
         for (File file: listOfDocuments) {
             text = HTMLProcessor.process(file.getPath());
 
-            File archive = new File(folder.getPath() + '/' + file.getName().replace(".html",".txt"));
+            File filteredFile = new File(processedFolder.getPath() + '/' + file.getName().replace(".html",".txt"));
 
-
-            StringUtils.removeAll(text,"\0");
-            StringBuilder sb = new StringBuilder(text);
-
-            for (int i = 1; i < sb.length(); i++){
-                if (sb.charAt(i) == '\n' && sb.charAt(i-1) == 32) sb.deleteCharAt(i);
-            }
-
-            text = sb.toString();
             int tokens = StringUtils.countMatches(text,"\n");
 
             if (tokens < minTokensBe) minTokensBe = tokens;
             if (tokens > maxTokensBe) maxTokensBe = tokens;
 
 
-            FileUtils.writeStringToFile(archive, text, "UTF-8");
+            FileUtils.writeStringToFile(filteredFile, text, "UTF-8");
             totalTokensBefore += tokens;
         }
 
+
         ArrayList<String> mostFreqBe = mostFrequentWords("processed");
 
-        File folder2 = new File("stopper");
-        if (!folder2.exists()) folder.mkdir();
-        else FileUtils.cleanDirectory(folder2);
+        File stopperFolder = new File("stopper");
+        createOrEmptyFolder(stopperFolder);
 
-        listOfDocuments = folder.listFiles();
+        System.out.println("Erasing empty words...");
+
+        listOfDocuments = processedFolder.listFiles();
         for (File file: listOfDocuments){
             text = stopper.deleteEmptyWords(file.getPath());
 
-            File archive = new File( folder2.getPath() + '/' + file.getName());
+            File archive = new File( stopperFolder.getPath() + '/' + file.getName());
             FileUtils.writeStringToFile(archive, text, "UTF-8");
 
-            StringUtils.removeAll(text,"\0");
-            StringBuilder sb = new StringBuilder(text);
-
-            for (int i = 1; i < sb.length(); i++){
-                if (sb.charAt(i) == '\n' && sb.charAt(i-1) == 32) sb.deleteCharAt(i);
-            }
-
-            text = sb.toString();
             int tokens = StringUtils.countMatches(text,"\n");
 
             if (tokens < minTokensAf) minTokensAf = tokens;
             if (tokens > maxTokensAf) maxTokensAf = tokens;
             totalTokensAfter += tokens;
         }
+
         ArrayList<String> mostFreqAf = mostFrequentWords("stopper");
 
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;
 
-        time_end = System.currentTimeMillis() - time_start;
+        long time_end = System.currentTimeMillis() - time_start;
         System.out.println("Processing finished. You can find the new files in ./stopper folder. Exiting...");
 
         System.out.println("########################## STATS ##############################");
@@ -203,9 +183,19 @@ public class SRI {
      * @param folder folder to be checked
      */
     private static void checkIfFolderExists(File folder){
-        if (folder.exists()){
+        if (!folder.exists()){
             System.out.println("Folder "+folder.getName()+" doesn't exist. Exiting...");
             System.exit(0);
         }
+    }
+
+    /**
+     * It creates a new folder, or erases everything inside an existing one.
+     * @param folder folder to be created or emptied
+     * @throws IOException
+     */
+    private  static void createOrEmptyFolder(File folder) throws IOException {
+        if (!folder.exists()) folder.mkdir();
+        else FileUtils.cleanDirectory(folder);
     }
 }

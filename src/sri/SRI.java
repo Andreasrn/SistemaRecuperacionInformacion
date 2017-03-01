@@ -5,7 +5,6 @@
  */
 package sri;
 
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import htmlprocessor.HTMLProcessor;
 
 import java.io.*;
@@ -28,21 +27,25 @@ public class SRI {
      */
     public static void main(String[] args) throws IOException {
 
-        long time_start, time_end;
+        /******************************VARIABLES DECLARATION******************************/
+
+        long time_end;
+
         String documentsPath = "documents";
+
         Scanner keyboard = new Scanner(System.in);
         String option;
-        int totalTokensBefore = 0;
-        float tokensPerFileBefore = 0;
-        float tokensPerFileAfter = 0;
         String[] mostFrequentWordsBefore, mostFrequentWordsAfter;
         int numFiles = 0;
         Stopper stopper = new Stopper();
         int totalTokensAfter = 0;
+        int totalTokensBefore = 0;
+        float tokensPerFileBefore = 0;
+        float tokensPerFileAfter = 0;
         int minTokensBe = 9999, maxTokensBe = 0, minTokensAf = 9999, maxTokensAf = 0;
 
 
-        /*******************************************************************************/
+        /***************************END VARIABLES DECLARATION***************************/
 
 
         System.out.println("Starting HTML processor...");
@@ -57,14 +60,11 @@ public class SRI {
             documentsPath = keyboard.nextLine();
         }
 
-        File documents = new File(documentsPath);
-        if (!documents.exists()){
-            System.out.println("Folder "+documentsPath+" doesn't exist. Exiting...");
-            System.exit(0);
-        }
+        File documentsFolder = new File(documentsPath);
 
+        checkIfFolderExists(documentsFolder);
 
-        time_start = System.currentTimeMillis();
+        long time_start = System.currentTimeMillis(); //<--------We count the time starting from here.
 
         File folder = new File("processed");
         if (!folder.exists()) folder.mkdir();
@@ -72,7 +72,7 @@ public class SRI {
 
 
 
-        File[] listOfDocuments = documents.listFiles();
+        File[] listOfDocuments = documentsFolder.listFiles();
         numFiles = listOfDocuments.length;
 
         String text;
@@ -196,5 +196,16 @@ public class SRI {
         return outputList;
 
 
+    }
+
+    /**
+     * It checks whether a folder exists or not. If it doesn't, the program ends.
+     * @param folder folder to be checked
+     */
+    private static void checkIfFolderExists(File folder){
+        if (folder.exists()){
+            System.out.println("Folder "+folder.getName()+" doesn't exist. Exiting...");
+            System.exit(0);
+        }
     }
 }

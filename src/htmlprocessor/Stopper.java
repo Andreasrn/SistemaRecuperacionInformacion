@@ -36,7 +36,6 @@ public class Stopper {
         String outputText = "";
         BufferedReader br = new BufferedReader(new FileReader(new File (path)));
 
-        ArrayList<String> listOfWords = new ArrayList<>();
         String word;
         while ( (word = br.readLine()) != null ){
             if (!emptyWords.contains(word)) outputText += word + "\n";

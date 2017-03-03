@@ -10,6 +10,7 @@ import htmlprocessor.HTMLProcessor;
 import java.io.*;
 import java.util.*;
 
+import htmlprocessor.Stemmer;
 import htmlprocessor.Stopper;
 
 import org.apache.commons.io.FileUtils;

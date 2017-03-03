@@ -11,8 +11,10 @@ import java.io.*;
 import java.util.*;
 
 import htmlprocessor.Stopper;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 
 /**
@@ -50,22 +52,12 @@ public class SRI {
 
         System.out.println("Starting HTML processor...");
 
-        do{
-            System.out.println("Do you want to process the default folder (./documents)? [Y/N] ");
-            option = keyboard.nextLine();
-        } while (!option.equals("Y") && !option.equals("y") && !option.equals("N") && !option.equals("n"));
-
-        if (option.equals("N") || option.equals("n")){
-            System.out.println("Enter the path of the folder: ");
-            documentsPath = keyboard.nextLine();
-        }
-
         long time_start = System.currentTimeMillis(); //<--------We count the time starting from here.
 
-        File documentsFolder = new File(documentsPath);
+        File documentsFolder = new File(params.get(DOCUMENTS_FOLDER));
         checkIfFolderExists(documentsFolder);
 
-        File processedFolder = new File("processed");
+        File processedFolder = new File(params.get(PROCESSED_FOLDER));
         createOrEmptyFolder(processedFolder);
 
         File[] listOfDocuments = documentsFolder.listFiles();
@@ -90,9 +82,9 @@ public class SRI {
         }
 
 
-        ArrayList<String> mostFreqBe = mostFrequentWords("processed");
+        ArrayList<sri.Pair<String,Integer>> mostFreqBe = mostFrequentWords(params.get(PROCESSED_FOLDER));
 
-        File stopperFolder = new File("stopper");
+        File stopperFolder = new File(params.get(STOPPER_FOLDER));
         createOrEmptyFolder(stopperFolder);
 
         System.out.println("Erasing empty words...");
@@ -111,7 +103,7 @@ public class SRI {
             totalTokensAfter += tokens;
         }
 
-        ArrayList<String> mostFreqAf = mostFrequentWords("stopper");
+        ArrayList<sri.Pair<String,Integer>> mostFreqAf = mostFrequentWords(params.get(STOPPER_FOLDER));
 
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;
 
@@ -126,12 +118,16 @@ public class SRI {
         System.out.printf("Total tokens obtained after applying Stopper: %s\nAverage tokens per file after applying Stopper: %s\n", totalTokensAfter, tokensPerFileAfter);
 
         System.out.print("Most frequent words before applying Stopper: ");
-        for (String word: mostFreqBe) System.out.print(word+" ");
+        for (int i = 0; i < mostFreqBe.size(); i++){
+            System.out.printf("%s(%d times) ",mostFreqBe.get(i).getFirst(),mostFreqBe.get(i).getSecond());
+        }
 
         System.out.println();
 
         System.out.print("Most frequent words after applying Stopper: ");
-        for (String word: mostFreqAf) System.out.print(word+" ");
+        for (int i = 0; i < mostFreqAf.size(); i++){
+            System.out.printf("%s(%d times) ",mostFreqAf.get(i).getFirst(),mostFreqAf.get(i).getSecond());
+        }
         System.out.println();
 
         System.out.printf("Max tokens contained in a document before processing: %s\nMin tokens contained in a document before processing: %s\n", maxTokensBe, minTokensBe);
@@ -143,9 +139,9 @@ public class SRI {
      * @param path path where the documents are stored
      * @return array with the most frequent words
      */
-    private static ArrayList mostFrequentWords(String path) throws IOException {
-        PriorityQueue<Map.Entry> listOfWords = new PriorityQueue<>(10,(o1, o2) -> {
-            return ((int) o2.getValue() - (int) o1.getValue());
+    private static ArrayList<sri.Pair<String,Integer>> mostFrequentWords(String path) throws IOException {
+        PriorityQueue<sri.Pair<String, Integer>> listOfWords = new PriorityQueue<>(10,(o1, o2) -> {
+            return ((int) o2.getSecond() - (int) o1.getSecond());
         });
 
         HashMap<String,Integer> mapOfWords = new HashMap<>();
@@ -168,12 +164,13 @@ public class SRI {
             }
         }
 
-        for (Map.Entry entry: mapOfWords.entrySet()){
-            listOfWords.offer(entry);
+        for (Map.Entry<String,Integer> entry: mapOfWords.entrySet()){
+            sri.Pair<String,Integer> tuple = new sri.Pair<String,Integer>(entry.getKey(),entry.getValue());
+            listOfWords.offer(tuple);
         }
 
         for (int i = 0; i < 5; i++){
-            outputList.add(listOfWords.poll().getKey());
+            outputList.add(new sri.Pair<String,Integer>(listOfWords.peek().getFirst(),listOfWords.poll().getSecond()));
         }
 
         return outputList;

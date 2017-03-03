@@ -56,8 +56,11 @@ public abstract class HTMLProcessor {
         String[] listOfWords = text.split("\\s+");
 
         for (String word: listOfWords){
-            outputText += word;
-            if (!outputText.endsWith("\n")) outputText += "\n";
+            if (!word.equals("-")){
+                outputText += word;
+                if (!outputText.endsWith("\n")) outputText += "\n";
+            }
+
         }
 
         return outputText;

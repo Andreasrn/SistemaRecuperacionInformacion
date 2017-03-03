@@ -44,6 +44,9 @@ public class SRI {
 
         /***************************END VARIABLES DECLARATION***************************/
 
+        ArrayList<String> params = loadParameters();
+        int STOPWORDS_FILE = 0, DOCUMENTS_FOLDER = 1, PROCESSED_FOLDER = 2, STOPPER_FOLDER = 3, STEMMER_FOLDER = 4;
+
 
         System.out.println("Starting HTML processor...");
 
@@ -197,5 +200,18 @@ public class SRI {
     private  static void createOrEmptyFolder(File folder) throws IOException {
         if (!folder.exists()) folder.mkdir();
         else FileUtils.cleanDirectory(folder);
+    }
+
+    private static ArrayList<String> loadParameters() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File("conf.data")));
+
+        ArrayList<String> params = new ArrayList<>();
+
+        String param;
+        while ((param = br.readLine()) != null ){
+            params.add(param);
+        }
+
+        return params;
     }
 }

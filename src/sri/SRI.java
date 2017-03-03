@@ -111,28 +111,34 @@ public class SRI {
         long time_end = System.currentTimeMillis() - time_start;
         System.out.println("Processing finished. You can find the new files in ./stopper folder. Exiting...");
 
-        System.out.println("########################## STATS ##############################");
+        System.out.println("########################## STATS ##############################\n");
 
         tokensPerFileBefore = (float) totalTokensBefore / numFiles;
-        System.out.println("Total time of processing (including I/O operations): "+ time_end / 1000.0 + " seconds.");
-        System.out.printf("Total tokens obtained before applying Stopper: %s\nAverage tokens per file before applying Stopper: %s\n", totalTokensBefore, tokensPerFileBefore);
-        System.out.printf("Total tokens obtained after applying Stopper: %s\nAverage tokens per file after applying Stopper: %s\n", totalTokensAfter, tokensPerFileAfter);
 
-        System.out.print("Most frequent words before applying Stopper: ");
+        System.out.println("General\n");
+        System.out.println("-Total time of processing (including I/O operations): "+ time_end / 1000.0 + " seconds.");
+        System.out.println("-Size of the collection: "+numFiles+"\n");
+        System.out.println("Normalizing stage\n");
+        System.out.printf("-Total tokens obtained: %s\n-Average tokens per file: %s\n", totalTokensBefore, tokensPerFileBefore);
+        System.out.print("-Most frequent words: ");
         for (int i = 0; i < mostFreqBe.size(); i++){
             System.out.printf("%s(%d times) ",mostFreqBe.get(i).getFirst(),mostFreqBe.get(i).getSecond());
         }
-
+        System.out.println();
+        System.out.printf("-Max tokens contained in a document: %s\n-Min tokens contained in a document: %s\n", maxTokensBe, minTokensBe);
         System.out.println();
 
-        System.out.print("Most frequent words after applying Stopper: ");
+        System.out.println("Stopper stage\n");
+        System.out.printf("-Total tokens obtained: %s\n-Average tokens per file: %s\n", totalTokensAfter, tokensPerFileAfter);
+        System.out.print("-Most frequent words: ");
         for (int i = 0; i < mostFreqAf.size(); i++){
             System.out.printf("%s(%d times) ",mostFreqAf.get(i).getFirst(),mostFreqAf.get(i).getSecond());
         }
         System.out.println();
+        System.out.printf("-Max tokens contained in a document: %s\n-Min tokens contained in a document: %s\n", maxTokensAf, minTokensAf);
+        System.out.println();
 
-        System.out.printf("Max tokens contained in a document before processing: %s\nMin tokens contained in a document before processing: %s\n", maxTokensBe, minTokensBe);
-        System.out.printf("Max tokens contained in a document after processing: %s\nMin tokens contained in a document after processing: %s\n", maxTokensAf, minTokensAf);
+        System.out.println("Stemmer stage\n");
     }
 
     /**

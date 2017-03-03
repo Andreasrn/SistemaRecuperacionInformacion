@@ -32,16 +32,15 @@ public class SRI {
 
         /******************************VARIABLES DECLARATION******************************/
 
-        String documentsPath = "documents";
-
-        Scanner keyboard = new Scanner(System.in);
-        String option;
-        String[] mostFrequentWordsBefore, mostFrequentWordsAfter;
         int totalTokensAfter = 0;
         int totalTokensBefore = 0;
         float tokensPerFileBefore = 0;
         float tokensPerFileAfter = 0;
         int minTokensBe = 9999, maxTokensBe = 0, minTokensAf = 9999, maxTokensAf = 0;
+
+        int totalTokensStemmer = 0;
+        float tokensPerFileStemmer = 0;
+        int minTokensStemmer = 9999, maxTokensStemmer = 0;
 
 
         /***************************END VARIABLES DECLARATION***************************/
@@ -106,6 +105,29 @@ public class SRI {
 
         ArrayList<sri.Pair<String,Integer>> mostFreqAf = mostFrequentWords(params.get(STOPPER_FOLDER));
 
+        File stemmerFolder = new File(params.get(STEMMER_FOLDER));
+        createOrEmptyFolder(stemmerFolder);
+
+        System.out.println("Extracting roots...");
+
+        listOfDocuments = stopperFolder.listFiles();
+        for (File file: listOfDocuments){
+            text = Stemmer.extractRoot(file.getPath());
+
+            File archive = new File(stemmerFolder.getPath() + "/" + file.getName());
+
+            FileUtils.writeStringToFile(archive, text, "UTF-8");
+
+            int tokens = StringUtils.countMatches(text,"\n");
+
+            if (tokens < minTokensStemmer) minTokensStemmer = tokens;
+            if (tokens > maxTokensStemmer) maxTokensStemmer = tokens;
+
+            totalTokensStemmer += tokens;
+        }
+
+        ArrayList<sri.Pair<String,Integer>> mostFreqStemmer = mostFrequentWords(params.get(STEMMER_FOLDER));
+
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;
 
         long time_end = System.currentTimeMillis() - time_start;
@@ -139,6 +161,16 @@ public class SRI {
         System.out.println();
 
         System.out.println("Stemmer stage\n");
+
+        tokensPerFileStemmer = totalTokensStemmer / (float)numFiles;
+        System.out.printf("-Total tokens obtained: %s\n-Average tokens per file: %s\n", totalTokensStemmer, tokensPerFileStemmer);
+        System.out.print("-Most frequent words: ");
+        for (int i = 0; i < mostFreqStemmer.size(); i++){
+            System.out.printf("%s(%d times) ",mostFreqStemmer.get(i).getFirst(),mostFreqStemmer.get(i).getSecond());
+        }
+        System.out.println();
+        System.out.printf("-Max tokens contained in a document: %s\n-Min tokens contained in a document: %s\n", maxTokensStemmer, minTokensStemmer);
+        System.out.println();
     }
 
     /**

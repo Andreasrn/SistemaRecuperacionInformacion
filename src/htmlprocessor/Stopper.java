@@ -13,14 +13,17 @@ public class Stopper {
 
     private TreeSet<String> emptyWords;
 
+
     /**
-     * Default constructor.
+     * Constructor which takes as a parameter the path of the file containing empty words.
+     * @param stopWordFilePath path of the file
+     * @throws IOException
      */
-    public Stopper() throws IOException {
+    public Stopper(String stopWordFilePath) throws IOException {
 
         emptyWords = new TreeSet<>();
 
-        FileReader r = new FileReader(new File("StopWords.txt"));
+        FileReader r = new FileReader(new File(stopWordFilePath));
         BufferedReader br = new BufferedReader(r);
 
         String word;

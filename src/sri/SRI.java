@@ -37,7 +37,6 @@ public class SRI {
         Scanner keyboard = new Scanner(System.in);
         String option;
         String[] mostFrequentWordsBefore, mostFrequentWordsAfter;
-        Stopper stopper = new Stopper();
         int totalTokensAfter = 0;
         int totalTokensBefore = 0;
         float tokensPerFileBefore = 0;
@@ -49,7 +48,6 @@ public class SRI {
 
         ArrayList<String> params = loadParameters();
         int STOPWORDS_FILE = 0, DOCUMENTS_FOLDER = 1, PROCESSED_FOLDER = 2, STOPPER_FOLDER = 3, STEMMER_FOLDER = 4;
-
 
         System.out.println("Starting HTML processor...");
 
@@ -89,6 +87,8 @@ public class SRI {
         createOrEmptyFolder(stopperFolder);
 
         System.out.println("Erasing empty words...");
+
+        Stopper stopper = new Stopper(params.get(STOPWORDS_FILE));
 
         listOfDocuments = processedFolder.listFiles();
         for (File file: listOfDocuments){
@@ -206,6 +206,11 @@ public class SRI {
         else FileUtils.cleanDirectory(folder);
     }
 
+    /**
+     * Returns an ArrayList which contains the parameter required for the execution. It cointains folder paths or file names.
+     * @return ArrayList with the parameters
+     * @throws IOException
+     */
     private static ArrayList<String> loadParameters() throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(new File("conf.data")));
 

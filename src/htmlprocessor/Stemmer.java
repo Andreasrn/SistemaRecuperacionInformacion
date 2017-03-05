@@ -2,9 +2,6 @@ package htmlprocessor;
 import org.tartarus.snowball.ext.*;
 
 import java.io.*;
-import java.util.ArrayList;
-
-import static java.awt.SystemColor.text;
 
 /**
  * Created by Andrea on 03/03/2017.

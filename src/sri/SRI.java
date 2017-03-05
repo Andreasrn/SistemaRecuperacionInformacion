@@ -1,33 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Information Retrieval System
+ * @Author: Andrea Serrano Urea
  */
 package sri;
 
 import htmlprocessor.HTMLProcessor;
-
 import java.io.*;
 import java.util.*;
-
 import htmlprocessor.Stemmer;
 import htmlprocessor.Stopper;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 
-/**
- *
- * @author Andrea
- */
 public class SRI {
 
     /**
      * @param args the command line arguments
      * @throws java.io.IOException
      */
+
     public static void main(String[] args) throws IOException {
 
         /******************************VARIABLES DECLARATION******************************/
@@ -131,7 +123,7 @@ public class SRI {
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;
 
         long time_end = System.currentTimeMillis() - time_start;
-        System.out.println("Processing finished. You can find the new files in ./stopper folder. Exiting...");
+        System.out.println("Processing finished. You can find the new files in " + params.get(STEMMER_FOLDER)+" folder. Exiting...");
 
         System.out.println("########################## STATS ##############################\n");
 
@@ -239,7 +231,7 @@ public class SRI {
     }
 
     /**
-     * Returns an ArrayList which contains the parameter required for the execution. It cointains folder paths or file names.
+     * Returns an ArrayList which contains the parameters required for the execution. It contains folder paths or file names.
      * @return ArrayList with the parameters
      * @throws IOException
      */

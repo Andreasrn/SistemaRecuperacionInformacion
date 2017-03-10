@@ -7,10 +7,13 @@ package sri;
 import htmlprocessor.HTMLProcessor;
 import java.io.*;
 import java.util.*;
+
+import htmlprocessor.Index;
 import htmlprocessor.Stemmer;
 import htmlprocessor.Stopper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 
 public class SRI {
@@ -20,7 +23,7 @@ public class SRI {
      * @throws java.io.IOException
      */
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 
         /******************************VARIABLES DECLARATION******************************/
 
@@ -120,6 +123,8 @@ public class SRI {
 
         ArrayList<sri.Pair<String,Integer>> mostFreqStemmer = mostFrequentWords(params.get(STEMMER_FOLDER));
 
+        Index index = new Index(params.get(STEMMER_FOLDER));
+
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;
 
         long time_end = System.currentTimeMillis() - time_start;
@@ -131,7 +136,6 @@ public class SRI {
 
         System.out.println("General\n");
         System.out.println("-Total time of processing (including I/O operations): "+ time_end / 1000.0 + " seconds.");
-        System.out.println("-Size of the collection: "+numFiles+"\n");
         System.out.println("Normalizing stage\n");
         System.out.printf("-Total tokens obtained: %s\n-Average tokens per file: %s\n", totalTokensBefore, tokensPerFileBefore);
         System.out.print("-Most frequent words: ");
@@ -162,6 +166,13 @@ public class SRI {
         }
         System.out.println();
         System.out.printf("-Max tokens contained in a document: %s\n-Min tokens contained in a document: %s\n", maxTokensStemmer, minTokensStemmer);
+        System.out.println();
+
+        System.out.println("Collection information\n");
+
+        System.out.printf("-Collection size: %s\n-Number of different words: %s\n",index.getSizeOfCollection(),index.getSizeOfDictionary());
+        System.out.printf("-Largest document: %s containing %s words.\n", index.getBiggestDocument().getFirst(),index.getBiggestDocument().getSecond());
+        System.out.printf("-Smallest document: %s containing %s words.\n", index.getSmallestDocument().getFirst(),index.getSmallestDocument().getSecond());
         System.out.println();
     }
 

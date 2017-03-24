@@ -65,9 +65,12 @@ public class Index {
                 if (!indexByWords.containsKey(word)){
                     indexByWords.put(word, new HashMap<>());
                     indexByWords.get(word).put(document.getName(),(float)1);
-                } else {
-                    indexByWords.get(word).put(document.getName(),indexByWords.get(word).get(document.getName()+1));
+                } else if (indexByWords.containsKey(word) && !indexByWords.get(word).containsKey(document.getName())) {
+                    indexByWords.get(word).put(document.getName(),(float)1);
+                } else if (indexByWords.containsKey(word) && indexByWords.get(word).containsKey(document.getName()))  {
+                    indexByWords.get(word).put(document.getName(), indexByWords.get(word).get(document.getName())+1);
                 }
+
 
                 if (!indexByDocs.get(document.getName()).containsKey(word)){
                     indexByDocs.get(document.getName()).put(word,(float)1.0);
@@ -78,47 +81,30 @@ public class Index {
 
         }
 
+        normalizeFreq();
+
+
+
     }
 
     /**
      * It normalizes the frequence of each word dividing by max freq in that document.
      */
     private void normalizeFreq(){
-        float maxFreq = 0;
+        float maxFreq;
 
-        Iterator docs = documents.iterator();
+        for (Map.Entry<String,HashMap<String,Float>> entry: indexByDocs.entrySet()) {
+            maxFreq = 0;
+            for (Map.Entry<String, Float> entry2 : entry.getValue().entrySet()) {
+                if (entry2.getValue() > maxFreq) maxFreq = entry2.getValue();
+            }
 
-        while (docs.hasNext()){
-
+            for (Map.Entry<String, Float> entry2 : entry.getValue().entrySet()) {
+                entry2.setValue(entry2.getValue()/maxFreq);
+                indexByWords.get(entry2.getKey()).put(entry.getKey(),entry2.getValue());
+            }
         }
-        /**
-        Iterator documents = indexByWords.entrySet().iterator();
-        Iterator words;
-        while (documents.hasNext()){
-            Map.Entry<String, HashMap<String,Integer>> pair = (Map.Entry) documents.next();
 
-            words = pair.getValue().entrySet().iterator();
-
-            while (words.hasNext()){
-                Map.Entry<String,Integer> pair2 = (Map.Entry) words.next();
-
-                if (pair2.getValue() > maxFreq) maxFreq = pair2.getValue();
-            }
-
-            words = pair.getValue().entrySet().iterator();
-
-            float normalizedFreq;
-
-            while (words.hasNext()){
-
-                Map.Entry<String,Integer> pair2 = (Map.Entry) words.next();
-
-                normalizedFreq = pair2.getValue() / maxFreq;
-
-                indexByWords.get(pair.getKey()).put(pair2.getKey(),normalizedFreq);
-            }
-
-        }*/
 
     }
 

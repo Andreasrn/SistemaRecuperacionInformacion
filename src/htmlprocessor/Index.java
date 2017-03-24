@@ -65,9 +65,12 @@ public class Index {
                 if (!indexByWords.containsKey(word)){
                     indexByWords.put(word, new HashMap<>());
                     indexByWords.get(word).put(document.getName(),(float)1);
-                } else {
-                    indexByWords.get(word).put(document.getName(),indexByWords.get(word).get(document.getName()+1));
+                } else if (indexByWords.containsKey(word) && !indexByWords.get(word).containsKey(document.getName())) {
+                    indexByWords.get(word).put(document.getName(),(float)1);
+                } else if (indexByWords.containsKey(word) && indexByWords.get(word).containsKey(document.getName()))  {
+                    indexByWords.get(word).put(document.getName(), indexByWords.get(word).get(document.getName())+1);
                 }
+
 
                 if (!indexByDocs.get(document.getName()).containsKey(word)){
                     indexByDocs.get(document.getName()).put(word,(float)1.0);
@@ -77,6 +80,8 @@ public class Index {
             }
 
         }
+
+
 
     }
 

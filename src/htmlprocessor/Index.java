@@ -6,17 +6,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Created by Andrea on 10/03/2017.
  */
 public class Index {
 
-    private HashMap<String, HashMap<String,Integer>> index;
+    private HashMap<String, HashMap<String,Float>> indexByWords, indexByDocs;
     private HashSet<String> words, documents;
 
     sri.Pair<String,Integer> biggestDoc, smallestDoc;
@@ -33,7 +30,8 @@ public class Index {
 
         words = new HashSet<>();
         documents = new HashSet<>();
-        index = new HashMap<>();
+        indexByWords = new HashMap<>();
+        indexByDocs = new HashMap<>();
 
         File folder = new File(collection);
 
@@ -59,18 +57,69 @@ public class Index {
 
             documents.add(document.getName());
 
+            indexByDocs.put(document.getName(),new HashMap<>());
+
             for (String word: listOfWords){
                 words.add(word);
 
-                if (!index.containsKey(word)){
-                    index.put(word, new HashMap<>());
-                    index.get(word).put(document.getName(),1);
+                if (!indexByWords.containsKey(word)){
+                    indexByWords.put(word, new HashMap<>());
+                    indexByWords.get(word).put(document.getName(),(float)1);
+                } else {
+                    indexByWords.get(word).put(document.getName(),indexByWords.get(word).get(document.getName()+1));
                 }
 
-                index.get(word).put(document.getName(),index.get(word).get(document.getName()+1));
+                if (!indexByDocs.get(document.getName()).containsKey(word)){
+                    indexByDocs.get(document.getName()).put(word,(float)1.0);
+                } else{
+                    indexByDocs.get(document.getName()).put(word, indexByDocs.get(document.getName()).get(word)+1);
+                }
             }
 
         }
+
+    }
+
+    /**
+     * It normalizes the frequence of each word dividing by max freq in that document.
+     */
+    private void normalizeFreq(){
+        float maxFreq = 0;
+
+        Iterator docs = documents.iterator();
+
+        while (docs.hasNext()){
+
+        }
+        /**
+        Iterator documents = indexByWords.entrySet().iterator();
+        Iterator words;
+        while (documents.hasNext()){
+            Map.Entry<String, HashMap<String,Integer>> pair = (Map.Entry) documents.next();
+
+            words = pair.getValue().entrySet().iterator();
+
+            while (words.hasNext()){
+                Map.Entry<String,Integer> pair2 = (Map.Entry) words.next();
+
+                if (pair2.getValue() > maxFreq) maxFreq = pair2.getValue();
+            }
+
+            words = pair.getValue().entrySet().iterator();
+
+            float normalizedFreq;
+
+            while (words.hasNext()){
+
+                Map.Entry<String,Integer> pair2 = (Map.Entry) words.next();
+
+                normalizedFreq = pair2.getValue() / maxFreq;
+
+                indexByWords.get(pair.getKey()).put(pair2.getKey(),normalizedFreq);
+            }
+
+        }*/
+
     }
 
     /**

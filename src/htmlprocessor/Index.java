@@ -171,22 +171,26 @@ public class Index {
         float norma = 0;
 
         for (Map.Entry<String,HashMap<String,Float>> word: indexByWords.entrySet()){
+
             weights.put(word.getKey(),new HashMap<>());
 
             df = word.getValue().entrySet().size();
 
-            idf = (float) Math.log(NUM_DOCS/df);
+            idf = (float) Math.log10(NUM_DOCS/df);
+
+            sumCuadrado = 0;
 
             for (Map.Entry<String,Float> document: word.getValue().entrySet()){
-                weights.get(word.getKey()).put(document.getKey(),document.getValue() * idf);
+                weights.get(word.getKey()).put(document.getKey(), document.getValue() * idf);
 
                 sumCuadrado += Math.pow(weights.get(word.getKey()).get(document.getKey()),2);
             }
 
             norma = (float) Math.sqrt(sumCuadrado);
 
+
             for (Map.Entry<String,Float> document: word.getValue().entrySet()){
-                weights.get(word.getKey()).put(document.getKey(),document.getValue()/norma);
+                weights.get(word.getKey()).put(document.getKey(),weights.get(word.getKey()).get(document.getKey())/norma);
             }
 
         }

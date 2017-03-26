@@ -83,6 +83,8 @@ public class Index {
 
         normalizeFreq();
 
+        calculateWeights();
+
 
 
     }
@@ -154,5 +156,41 @@ public class Index {
         return outputText;
     }
 
+    /**
+     * It creates the table containing the weight of each word in each document
+     */
+   private void calculateWeights(){
+
+       int NUM_DOCS = getSizeOfCollection();
+
+        HashMap<String,HashMap<String,Float>> weights = new HashMap<>();
+
+        float df;
+        float idf;
+        float sumCuadrado = 0;
+        float norma = 0;
+
+        for (Map.Entry<String,HashMap<String,Float>> word: indexByWords.entrySet()){
+            weights.put(word.getKey(),new HashMap<>());
+
+            df = word.getValue().entrySet().size();
+
+            idf = (float) Math.log(NUM_DOCS/df);
+
+            for (Map.Entry<String,Float> document: word.getValue().entrySet()){
+                weights.get(word.getKey()).put(document.getKey(),document.getValue() * idf);
+
+                sumCuadrado += Math.pow(weights.get(word.getKey()).get(document.getKey()),2);
+            }
+
+            norma = (float) Math.sqrt(sumCuadrado);
+
+            for (Map.Entry<String,Float> document: word.getValue().entrySet()){
+                weights.get(word.getKey()).put(document.getKey(),document.getValue()/norma);
+            }
+
+        }
+
+   }
 
 }

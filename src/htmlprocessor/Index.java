@@ -13,8 +13,9 @@ import java.util.*;
  */
 public class Index {
 
-    private HashMap<String, HashMap<String,Float>> indexByWords, indexByDocs;
+    private HashMap<String, HashMap<String,Double>> indexByWords, indexByDocs;
     private HashSet<String> words, documents;
+    private HashMap<String,HashMap<String,Pair<Double, Double>>> weights;
 
     sri.Pair<String,Integer> biggestDoc, smallestDoc;
 
@@ -64,16 +65,16 @@ public class Index {
 
                 if (!indexByWords.containsKey(word)){
                     indexByWords.put(word, new HashMap<>());
-                    indexByWords.get(word).put(document.getName(),(float)1);
+                    indexByWords.get(word).put(document.getName(),1.0);
                 } else if (indexByWords.containsKey(word) && !indexByWords.get(word).containsKey(document.getName())) {
-                    indexByWords.get(word).put(document.getName(),(float)1);
+                    indexByWords.get(word).put(document.getName(),1.0);
                 } else if (indexByWords.containsKey(word) && indexByWords.get(word).containsKey(document.getName()))  {
                     indexByWords.get(word).put(document.getName(), indexByWords.get(word).get(document.getName())+1);
                 }
 
 
                 if (!indexByDocs.get(document.getName()).containsKey(word)){
-                    indexByDocs.get(document.getName()).put(word,(float)1.0);
+                    indexByDocs.get(document.getName()).put(word,1.0);
                 } else{
                     indexByDocs.get(document.getName()).put(word, indexByDocs.get(document.getName()).get(word)+1);
                 }
@@ -85,23 +86,21 @@ public class Index {
 
         calculateWeights();
 
-
-
     }
 
     /**
      * It normalizes the frequence of each word dividing by max freq in that document.
      */
     private void normalizeFreq(){
-        float maxFreq;
+        double maxFreq;
 
-        for (Map.Entry<String,HashMap<String,Float>> entry: indexByDocs.entrySet()) {
+        for (Map.Entry<String,HashMap<String,Double>> entry: indexByDocs.entrySet()) {
             maxFreq = 0;
-            for (Map.Entry<String, Float> entry2 : entry.getValue().entrySet()) {
+            for (Map.Entry<String, Double> entry2 : entry.getValue().entrySet()) {
                 if (entry2.getValue() > maxFreq) maxFreq = entry2.getValue();
             }
 
-            for (Map.Entry<String, Float> entry2 : entry.getValue().entrySet()) {
+            for (Map.Entry<String, Double> entry2 : entry.getValue().entrySet()) {
                 entry2.setValue(entry2.getValue()/maxFreq);
                 indexByWords.get(entry2.getKey()).put(entry.getKey(),entry2.getValue());
             }
@@ -161,16 +160,16 @@ public class Index {
      */
    private void calculateWeights(){
 
-       int NUM_DOCS = getSizeOfCollection();
+        int NUM_DOCS = getSizeOfCollection();
 
-        HashMap<String,HashMap<String,Float>> weights = new HashMap<>();
+        weights = new HashMap<>();
 
-        float df;
-        float idf;
-        float sumCuadrado = 0;
-        float norma = 0;
+        double df;
+        double idf;
+        double sumCuadrado = 0;
+        double norma = 0;
 
-        for (Map.Entry<String,HashMap<String,Float>> word: indexByWords.entrySet()){
+        for (Map.Entry<String,HashMap<String,Double>> word: indexByWords.entrySet()){
 
             weights.put(word.getKey(),new HashMap<>());
 
@@ -180,22 +179,23 @@ public class Index {
 
             sumCuadrado = 0;
 
-            for (Map.Entry<String,Float> document: word.getValue().entrySet()){
-                weights.get(word.getKey()).put(document.getKey(), document.getValue() * idf);
+            for (Map.Entry<String,Double> document: word.getValue().entrySet()){
+                weights.get(word.getKey()).put(document.getKey(), new Pair<>(document.getValue() * idf,idf));
 
-                sumCuadrado += Math.pow(weights.get(word.getKey()).get(document.getKey()),2);
+                sumCuadrado += Math.pow(weights.get(word.getKey()).get(document.getKey()).getFirst(),2);
             }
 
             norma = (float) Math.sqrt(sumCuadrado);
 
 
-            for (Map.Entry<String,Float> document: word.getValue().entrySet()){
-                weights.get(word.getKey()).put(document.getKey(),weights.get(word.getKey()).get(document.getKey())/norma);
+            for (Map.Entry<String,Double> document: word.getValue().entrySet()){
+                weights.get(word.getKey()).put(document.getKey(),new Pair<>(weights.get(word.getKey()).get(document.getKey()).getFirst()/norma,
+                                                                            weights.get(word.getKey()).get(document.getKey()).getSecond()));
             }
 
         }
 
-       System.out.printf("");
+
    }
 
 }

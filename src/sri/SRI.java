@@ -123,6 +123,8 @@ public class SRI {
 
         ArrayList<sri.Pair<String,Integer>> mostFreqStemmer = mostFrequentWords(params.get(STEMMER_FOLDER));
 
+
+        System.out.println("Generating index...");
         Index index = new Index(params.get(STEMMER_FOLDER));
 
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;

@@ -4,11 +4,13 @@ package sri;/*
  * and open the template in the editor.
  */
 
+import java.io.Serializable;
+
 /**
  *
  * @author Onichan
  */
-public class Pair<F, S> {
+public class Pair<F, S> implements Serializable{
 
     private F first; //first member of pair
     private S second; //second member of pair

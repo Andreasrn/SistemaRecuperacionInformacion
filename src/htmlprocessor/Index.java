@@ -1,11 +1,9 @@
 package htmlprocessor;
 
+import sri.ClaseSerializable;
 import sri.Pair;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -85,6 +83,10 @@ public class Index {
         normalizeFreq();
 
         calculateWeights();
+
+        ClaseSerializable<HashMap<String,HashMap<String,Pair<Double,Double>>>> output = new ClaseSerializable<>(weights);
+       output.escribirObjeto("index");
+
 
     }
 

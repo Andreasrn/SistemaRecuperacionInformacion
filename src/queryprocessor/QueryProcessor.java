@@ -49,7 +49,6 @@ public class QueryProcessor {
             }
         }
 
-        System.out.printf("La consulta inicial era: %s\nLa consulta ahora es: %s", query,output);
         return output;
     }
 }

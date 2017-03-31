@@ -14,6 +14,7 @@ import htmlprocessor.Stopper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import queryprocessor.QueryProcessor;
 
 
 public class SRI {
@@ -176,6 +177,8 @@ public class SRI {
         System.out.printf("-Largest document: %s containing %s words.\n", index.getBiggestDocument().getFirst(),index.getBiggestDocument().getSecond());
         System.out.printf("-Smallest document: %s containing %s words.\n", index.getSmallestDocument().getFirst(),index.getSmallestDocument().getSecond());
         System.out.println();
+
+
     }
 
     /**

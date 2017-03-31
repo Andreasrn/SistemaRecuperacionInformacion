@@ -4,6 +4,9 @@
  */
 package sri;
 
+import queryprocessor.QueryProcessor;
+
+import java.io.File;
 import java.util.*;
 
 
@@ -19,14 +22,40 @@ public class SRI {
         Boolean indexExist = false;
         Scanner scan = new Scanner(System.in);
         String option;
+        String query;
+        QueryProcessor qp = new QueryProcessor("StopWords.txt");
 
-        System.out.print("Select an option: \n");
-        System.out.print("1. Generate index.\n");
-        System.out.print("2. Send a query. \n");
+        do {
+            System.out.print("Select an option: \n");
+            System.out.print("1. Generate index.\n");
+            System.out.print("2. Send a query. \n");
+            System.out.print("3. Exit. \n");
 
+            option = scan.nextLine();
 
+            if (option.equals("1")){
+                File index = new File("index.obj");
+                if (index.exists()){
+                    System.out.print("There is already an index. Would you like to delete it and create another one? [y/n]\n");
+                    option = scan.nextLine();
 
-        CollectionProcessor.processCollection();
+                    if (option.equals("y")){
+                        index.delete();
+                        CollectionProcessor.processCollection();
+                    }
+
+                }
+            } else if (option.equals("2")){
+                System.out.print("Enter your query: \n");
+                query = scan.nextLine();
+
+                query = qp.processQuery(query);
+
+                System.out.printf("You processed query is '%s'.\n",query);
+
+            }
+        } while (!option.equals("3"));
+
 
 
     }

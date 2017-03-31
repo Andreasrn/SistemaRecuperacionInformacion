@@ -30,9 +30,8 @@ public class QueryProcessor {
     }
 
     public String processQuery(String query) {
-        String _query = Jsoup.parse(query).text();
 
-        _query = _query.toLowerCase();
+        String _query = query.toLowerCase();
 
         _query = StringUtils.stripAccents(_query);
 
@@ -49,7 +48,8 @@ public class QueryProcessor {
             }
         }
 
-        System.out.printf("La consulta inicial era: %s\nLa consulta ahora es: %s", query,output);
+        output.trim();
+
         return output;
     }
 }

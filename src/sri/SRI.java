@@ -44,7 +44,10 @@ public class SRI {
                         CollectionProcessor.processCollection();
                     }
 
+                } else {
+                    CollectionProcessor.processCollection();
                 }
+
             } else if (option.equals("2")){
                 System.out.print("Enter your query: \n");
                 query = scan.nextLine();
@@ -52,6 +55,8 @@ public class SRI {
                 query = qp.processQuery(query);
 
                 System.out.printf("You processed query is '%s'.\n",query);
+
+                qp.calculateWeights(query);
 
             }
         } while (!option.equals("3"));

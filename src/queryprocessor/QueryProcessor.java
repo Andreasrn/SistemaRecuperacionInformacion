@@ -1,7 +1,6 @@
 package queryprocessor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
 import org.tartarus.snowball.ext.spanishStemmer;
 import sri.ClaseSerializable;
 import sri.Pair;
@@ -66,9 +65,11 @@ public class QueryProcessor {
         HashMap<String,Double> weights = new HashMap<>();
         HashMap<String,Double> freq = new HashMap<>();
         Double maxFreq = 0.0;
-        ClaseSerializable<HashMap<String, HashMap <String, Pair<String,Double>>>> indexFile = new ClaseSerializable<>();
+        ClaseSerializable<HashMap<String, Pair<Double,HashMap<String,Double>>>> indexFile = new ClaseSerializable<>();
 
-        HashMap<String, HashMap <String, Pair<String,Double>>> index = indexFile.leerObjeto("index.obj");
+        System.out.print("Loading index...\n");
+        HashMap<String, Pair<Double,HashMap<String,Double>>> index = indexFile.leerObjeto("index.obj");
+        System.out.print("Index loaded.\n");
 
         for (String word: query.split(" ")){
 
@@ -80,11 +81,19 @@ public class QueryProcessor {
         }
 
         for (Map.Entry<String,Double> word: freq.entrySet()){
-            freq.put(word.getKey(), freq.get(word)/maxFreq);
+            System.out.println(word.getKey());
+            System.out.println(word.getValue());
+            freq.put(word.getKey(), freq.get(word.getKey())/maxFreq);
         }
 
         for(Map.Entry<String,Double> word: freq.entrySet()){
-            //weights.put(word.getKey(), word.getValue() * index.get(word).getSecond()); --> This should work when index changes
+
+            if (index.containsKey(word.getKey())){
+                weights.put(word.getKey(), word.getValue() * index.get(word.getKey()).getFirst());
+            } else {
+                weights.put(word.getKey(), 0.0);
+            }
+
 
         }
 

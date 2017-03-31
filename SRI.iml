@@ -9,5 +9,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="libraries" level="project" />
     <orderEntry type="library" name="libstemmer_java " level="project" />
+    <orderEntry type="library" name="libstemmer_java  (2)" level="project" />
+    <orderEntry type="library" name="jsoup-1.10.2 " level="project" />
+    <orderEntry type="library" name="commons-lang3-3.5 " level="project" />
+    <orderEntry type="library" name="commons-io-2.5 " level="project" />
   </component>
 </module>

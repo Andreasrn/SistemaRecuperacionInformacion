@@ -13,7 +13,7 @@ public class Index {
 
     private HashMap<String, HashMap<String,Double>> indexByWords, indexByDocs;
     private HashSet<String> words, documents;
-    private HashMap<String,HashMap<String,Pair<Double, Double>>> weights;
+    private HashMap<String,Pair<Double,HashMap<String, Double>>> weights;
 
     sri.Pair<String,Integer> biggestDoc, smallestDoc;
 
@@ -84,14 +84,14 @@ public class Index {
 
         calculateWeights();
 
-        ClaseSerializable<HashMap<String,HashMap<String,Pair<Double,Double>>>> output = new ClaseSerializable<>(weights);
-       output.escribirObjeto("index");
+        ClaseSerializable<HashMap<String,Pair<Double,HashMap<String,Double>>>> output = new ClaseSerializable<>(weights);
+        output.escribirObjeto("index");
 
 
     }
 
     /**
-     * It normalizes the frequence of each word dividing by max freq in that document.
+     * It normalizes the frequency of each word dividing by max freq in that document.
      */
     private void normalizeFreq(){
         double maxFreq;
@@ -173,26 +173,26 @@ public class Index {
 
         for (Map.Entry<String,HashMap<String,Double>> word: indexByWords.entrySet()){
 
-            weights.put(word.getKey(),new HashMap<>());
-
             df = word.getValue().entrySet().size();
 
             idf = (float) Math.log10(NUM_DOCS/df);
 
+            weights.put(word.getKey(),new Pair(idf, new HashMap<>()));
+
             sumCuadrado = 0;
 
             for (Map.Entry<String,Double> document: word.getValue().entrySet()){
-                weights.get(word.getKey()).put(document.getKey(), new Pair<>(document.getValue() * idf,idf));
+                weights.get(word.getKey()).getSecond().put(document.getKey(), document.getValue() * idf);
 
-                sumCuadrado += Math.pow(weights.get(word.getKey()).get(document.getKey()).getFirst(),2);
+                sumCuadrado += Math.pow(weights.get(word.getKey()).getSecond().get(document.getKey()),2);
             }
 
             norma = (float) Math.sqrt(sumCuadrado);
 
 
             for (Map.Entry<String,Double> document: word.getValue().entrySet()){
-                weights.get(word.getKey()).put(document.getKey(),new Pair<>(weights.get(word.getKey()).get(document.getKey()).getFirst()/norma,
-                                                                            weights.get(word.getKey()).get(document.getKey()).getSecond()));
+                weights.get(word.getKey()).getSecond().put(document.getKey(),weights.get(word.getKey()).getSecond().get(document.getKey())/norma);
+
             }
 
         }

@@ -12,6 +12,7 @@ public class ClaseSerializable <T> implements Serializable{
     public ClaseSerializable(T obj){
         objeto = obj;
     }
+    public ClaseSerializable(){ objeto = null;}
 
     public T getObjeto(){
         return objeto;

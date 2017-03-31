@@ -3,8 +3,12 @@ package queryprocessor;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.tartarus.snowball.ext.spanishStemmer;
+import sri.ClaseSerializable;
+import sri.Pair;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeSet;
 
 /**
@@ -29,6 +33,11 @@ public class QueryProcessor {
         while ( (word = br.readLine()) != null) emptyWords.add(word);
     }
 
+    /**
+     * It takes a query and normalize it. Empty words are removed and roots are extracted.
+     * @param query query to process
+     * @return processed query
+     */
     public String processQuery(String query) {
 
         String _query = query.toLowerCase();
@@ -51,5 +60,36 @@ public class QueryProcessor {
         output.trim();
 
         return output;
+    }
+
+    public HashMap<String,Double> calculateWeights(String query) throws IOException, ClassNotFoundException {
+        HashMap<String,Double> weights = new HashMap<>();
+        HashMap<String,Double> freq = new HashMap<>();
+        Double maxFreq = 0.0;
+        ClaseSerializable<HashMap<String, HashMap <String, Pair<String,Double>>>> indexFile = new ClaseSerializable<>();
+
+        HashMap<String, HashMap <String, Pair<String,Double>>> index = indexFile.leerObjeto("index.obj");
+
+        for (String word: query.split(" ")){
+
+            if (!freq.containsKey(word)) freq.put(word,1.0);
+            else freq.put(word,freq.get(word)+1);
+
+            if (freq.get(word) > maxFreq) maxFreq = freq.get(word);
+
+        }
+
+        for (Map.Entry<String,Double> word: freq.entrySet()){
+            freq.put(word.getKey(), freq.get(word)/maxFreq);
+        }
+
+        for(Map.Entry<String,Double> word: freq.entrySet()){
+            //weights.put(word.getKey(), word.getValue() * index.get(word).getSecond()); --> This should work when index changes
+
+        }
+
+        return weights;
+
+
     }
 }

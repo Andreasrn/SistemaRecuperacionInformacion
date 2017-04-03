@@ -5,6 +5,7 @@ import org.tartarus.snowball.ext.spanishStemmer;
 import sri.ClaseSerializable;
 import sri.Pair;
 
+import java.awt.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,13 +16,14 @@ import java.util.TreeSet;
  */
 public class QueryProcessor {
     private TreeSet<String> emptyWords;
+    private HashMap<String, Pair<Double,HashMap<String,Double>>> index;
 
     /**
-     * Default constructor which needs the path of StopWords file to work.
+     * Default constructor which needs the path of StopWords file to work. It loads in memory the index.
      * @param stopWordFilePath
      * @throws IOException
      */
-    public QueryProcessor(String stopWordFilePath) throws IOException {
+    public QueryProcessor(String stopWordFilePath) throws IOException, ClassNotFoundException {
 
         emptyWords = new TreeSet<>();
 
@@ -30,6 +32,14 @@ public class QueryProcessor {
 
         String word;
         while ( (word = br.readLine()) != null) emptyWords.add(word);
+
+        ClaseSerializable<HashMap<String, Pair<Double,HashMap<String,Double>>>> indexFile = new ClaseSerializable<>();
+
+        System.out.print("Loading index...\n");
+        index = indexFile.leerObjeto("index.obj");
+        System.out.print("Index loaded.\n");
+
+
     }
 
     /**
@@ -38,6 +48,8 @@ public class QueryProcessor {
      * @return processed query
      */
     public String processQuery(String query) {
+
+        System.out.println("Your query was "+query+'.');
 
         String _query = query.toLowerCase();
 
@@ -58,18 +70,27 @@ public class QueryProcessor {
 
         output.trim();
 
+        System.out.println("Your query will be treated as "+output+'.');
+
         return output;
     }
 
+
+    /**
+     * It returns a map associating weights to each word of the query
+     * @param query query whose weights are calculated
+     * @return Map <Word,Weight>
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public HashMap<String,Double> calculateWeights(String query) throws IOException, ClassNotFoundException {
+
+        System.out.println("Calculating weights of the query...");
+
         HashMap<String,Double> weights = new HashMap<>();
         HashMap<String,Double> freq = new HashMap<>();
         Double maxFreq = 0.0;
-        ClaseSerializable<HashMap<String, Pair<Double,HashMap<String,Double>>>> indexFile = new ClaseSerializable<>();
 
-        System.out.print("Loading index...\n");
-        HashMap<String, Pair<Double,HashMap<String,Double>>> index = indexFile.leerObjeto("index.obj");
-        System.out.print("Index loaded.\n");
 
         for (String word: query.split(" ")){
 
@@ -81,8 +102,6 @@ public class QueryProcessor {
         }
 
         for (Map.Entry<String,Double> word: freq.entrySet()){
-            System.out.println(word.getKey());
-            System.out.println(word.getValue());
             freq.put(word.getKey(), freq.get(word.getKey())/maxFreq);
         }
 
@@ -97,8 +116,12 @@ public class QueryProcessor {
 
         }
 
+        System.out.println("Weights calculated.");
         return weights;
 
+    }
 
+    public HashMap<String,Double> calculateSimilarity(HashMap<String,Double> queryWeights){
+        return null;
     }
 }

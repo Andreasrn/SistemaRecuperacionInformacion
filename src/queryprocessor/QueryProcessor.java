@@ -7,9 +7,8 @@ import sri.Pair;
 
 import java.awt.*;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Created by Andrea on 31/03/2017.
@@ -121,7 +120,46 @@ public class QueryProcessor {
 
     }
 
-    public HashMap<String,Double> calculateSimilarity(HashMap<String,Double> queryWeights){
-        return null;
+    public PriorityQueue<Pair<String,Double>> calculateSimilarity(HashMap<String,Double> queryWeights){
+        System.out.println("Calculating similarities with documents...");
+
+        PriorityQueue<Pair<String, Double>> output = new PriorityQueue<>(10, (o1,o2) -> {
+            return ( (int)  (o2.getSecond() -  o1.getSecond()));
+        });
+
+        File documentsFolder = new File("stemmer");
+        String doc;
+        double numerator;
+        double sumQueryWeights = 0;
+        double sumDocWeights = 0;
+
+        for (Double weight: queryWeights.values()){
+            sumQueryWeights += Math.pow(weight,2);
+        }
+
+        for (File document: documentsFolder.listFiles()){
+
+            numerator = 0;
+
+            doc = document.getName();
+            sumDocWeights = 0;
+
+            for (String wordInQuery: queryWeights.keySet()){
+                if (index.containsKey(wordInQuery)){
+                    if (index.get(wordInQuery).getSecond().containsKey(doc)){
+                        numerator += (index.get(wordInQuery).getSecond().get(doc) * queryWeights.get(wordInQuery));
+
+                        sumDocWeights += Math.pow(index.get(wordInQuery).getSecond().get(doc),2);
+                    }
+                }
+
+
+            }
+
+            output.offer(new Pair<>(doc, numerator / (sumDocWeights*sumQueryWeights)));
+
+        }
+
+        return output;
     }
 }

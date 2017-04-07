@@ -56,7 +56,11 @@ public class SRI {
 
                 System.out.printf("You processed query is '%s'.\n",query);
 
-                qp.calculateWeights(query);
+                HashMap<String,Double> queryWeights = qp.calculateWeights(query);
+
+                qp.calculateSimilarity(queryWeights);
+
+
 
             }
         } while (!option.equals("3"));

@@ -55,8 +55,6 @@ public class SRI {
 
                 query = qp.processQuery(query);
 
-                System.out.printf("You processed query is '%s'.\n",query);
-
                 HashMap<String,Double> queryWeights = qp.calculateWeights(query);
 
                 PriorityQueue<Pair<String,Double>> retrievedDocs = qp.calculateSimilarity(queryWeights);

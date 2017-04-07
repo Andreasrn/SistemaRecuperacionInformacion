@@ -100,11 +100,6 @@ public class QueryProcessor {
 
         }
 
-        for (Map.Entry<String,Double> word: freq.entrySet()){
-            freq.put(word.getKey(), word.getValue()/maxFreq);
-        }
-
-
 
         for (Map.Entry<String,Double> word: freq.entrySet()){
             freq.put(word.getKey(), freq.get(word.getKey())/maxFreq);

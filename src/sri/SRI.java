@@ -60,10 +60,13 @@ public class SRI {
                 HashMap<String,Double> queryWeights = qp.calculateWeights(query);
 
                 PriorityQueue<Pair<String,Double>> retrievedDocs = qp.calculateSimilarity(queryWeights);
+                int numDocs =  retrievedDocs.size();
+                Pair<String,Double> doc;
 
                 System.out.println("Results:");
 
-                for (Pair<String,Double> doc: retrievedDocs){
+                for (int i = 0; i < numDocs; i++){
+                    doc = retrievedDocs.poll();
                     System.out.printf("%s -> %s\n",doc.getFirst(),doc.getSecond());
                 }
 

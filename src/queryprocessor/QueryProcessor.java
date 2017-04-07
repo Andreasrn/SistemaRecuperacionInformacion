@@ -101,6 +101,12 @@ public class QueryProcessor {
         }
 
         for (Map.Entry<String,Double> word: freq.entrySet()){
+            freq.put(word.getKey(), word.getValue()/maxFreq);
+        }
+
+
+
+        for (Map.Entry<String,Double> word: freq.entrySet()){
             freq.put(word.getKey(), freq.get(word.getKey())/maxFreq);
         }
 
@@ -124,7 +130,14 @@ public class QueryProcessor {
         System.out.println("Calculating similarities with documents...");
 
         PriorityQueue<Pair<String, Double>> output = new PriorityQueue<>(10, (o1,o2) -> {
-            return ( (int)  (o2.getSecond() -  o1.getSecond()));
+
+            Double result = o2.getSecond() - o1.getSecond();
+
+            if (result == 0) return 0;
+            if (result > 0) return 1;
+
+            return -1;
+
         });
 
         File documentsFolder = new File("stemmer");
@@ -161,6 +174,7 @@ public class QueryProcessor {
             sumDocWeights = Math.sqrt(sumDocWeights);
 
             if (numerator != 0 && sumDocWeights != 0) output.offer(new Pair<>(doc, numerator / (sumDocWeights*sumQueryWeights)));
+
 
         }
 

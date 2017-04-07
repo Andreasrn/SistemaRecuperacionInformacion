@@ -7,6 +7,7 @@ package sri;
 import queryprocessor.QueryProcessor;
 
 import java.io.File;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 
@@ -58,7 +59,13 @@ public class SRI {
 
                 HashMap<String,Double> queryWeights = qp.calculateWeights(query);
 
-                qp.calculateSimilarity(queryWeights);
+                PriorityQueue<Pair<String,Double>> retrievedDocs = qp.calculateSimilarity(queryWeights);
+
+                System.out.println("Results:");
+
+                for (Pair<String,Double> doc: retrievedDocs){
+                    System.out.printf("%s -> %s\n",doc.getFirst(),doc.getSecond());
+                }
 
 
 

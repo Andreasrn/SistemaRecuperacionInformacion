@@ -137,6 +137,8 @@ public class QueryProcessor {
             sumQueryWeights += Math.pow(weight,2);
         }
 
+        sumQueryWeights = Math.sqrt(sumQueryWeights);
+
         for (File document: documentsFolder.listFiles()){
 
             numerator = 0;
@@ -156,7 +158,9 @@ public class QueryProcessor {
 
             }
 
-            output.offer(new Pair<>(doc, numerator / (sumDocWeights*sumQueryWeights)));
+            sumDocWeights = Math.sqrt(sumDocWeights);
+
+            if (numerator != 0 && sumDocWeights != 0) output.offer(new Pair<>(doc, numerator / (sumDocWeights*sumQueryWeights)));
 
         }
 

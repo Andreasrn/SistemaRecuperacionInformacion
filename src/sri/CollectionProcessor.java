@@ -22,10 +22,14 @@ import java.util.PriorityQueue;
 public abstract class CollectionProcessor {
 
     /**
-     * Takes a set of documents and generates an index (index.obj).
+     * Generates a collection given a set of html files.
+     * @param stopWords path of the file containing words to be removed
+     * @param docs path of the original files of the collection
+     * @param processed path where processed docs are stored
+     * @param stop path where files without stop words are stored
      * @throws Exception
      */
-    public static void processCollection() throws Exception {
+    public static void processCollection(String stopWords, String docs, String processed,String stemmer, String stop) throws Exception {
         /******************************VARIABLES DECLARATION******************************/
 
         int totalTokensAfter = 0;
@@ -41,17 +45,14 @@ public abstract class CollectionProcessor {
 
         /***************************END VARIABLES DECLARATION***************************/
 
-        ArrayList<String> params = loadParameters();
-        int STOPWORDS_FILE = 0, DOCUMENTS_FOLDER = 1, PROCESSED_FOLDER = 2, STOPPER_FOLDER = 3, STEMMER_FOLDER = 4;
-
         System.out.println("Starting HTML processor...");
 
         long time_start = System.currentTimeMillis(); //<--------We count the time starting from here.
 
-        File documentsFolder = new File(params.get(DOCUMENTS_FOLDER));
+        File documentsFolder = new File(docs);
         checkIfFolderExists(documentsFolder);
 
-        File processedFolder = new File(params.get(PROCESSED_FOLDER));
+        File processedFolder = new File(processed);
         createOrEmptyFolder(processedFolder);
 
         File[] listOfDocuments = documentsFolder.listFiles();
@@ -76,14 +77,14 @@ public abstract class CollectionProcessor {
         }
 
 
-        ArrayList<sri.Pair<String,Integer>> mostFreqBe = mostFrequentWords(params.get(PROCESSED_FOLDER));
+        ArrayList<sri.Pair<String,Integer>> mostFreqBe = mostFrequentWords(processed);
 
-        File stopperFolder = new File(params.get(STOPPER_FOLDER));
+        File stopperFolder = new File(stop);
         createOrEmptyFolder(stopperFolder);
 
         System.out.println("Erasing empty words...");
 
-        Stopper stopper = new Stopper(params.get(STOPWORDS_FILE));
+        Stopper stopper = new Stopper(stopWords);
 
         listOfDocuments = processedFolder.listFiles();
         for (File file: listOfDocuments){
@@ -99,9 +100,9 @@ public abstract class CollectionProcessor {
             totalTokensAfter += tokens;
         }
 
-        ArrayList<sri.Pair<String,Integer>> mostFreqAf = mostFrequentWords(params.get(STOPPER_FOLDER));
+        ArrayList<sri.Pair<String,Integer>> mostFreqAf = mostFrequentWords(stop);
 
-        File stemmerFolder = new File(params.get(STEMMER_FOLDER));
+        File stemmerFolder = new File(stemmer);
         createOrEmptyFolder(stemmerFolder);
 
         System.out.println("Extracting roots...");
@@ -122,16 +123,16 @@ public abstract class CollectionProcessor {
             totalTokensStemmer += tokens;
         }
 
-        ArrayList<sri.Pair<String,Integer>> mostFreqStemmer = mostFrequentWords(params.get(STEMMER_FOLDER));
+        ArrayList<sri.Pair<String,Integer>> mostFreqStemmer = mostFrequentWords(stemmer);
 
 
         System.out.println("Generating index...");
-        Index index = new Index(params.get(STEMMER_FOLDER));
+        Index index = new Index(stemmer);
 
         tokensPerFileAfter = (float) totalTokensAfter / numFiles;
 
         long time_end = System.currentTimeMillis() - time_start;
-        System.out.println("Processing finished. You can find the new files in " + params.get(STEMMER_FOLDER)+" folder. Exiting...");
+        System.out.println("Processing finished. You can find the new files in " + stemmer+" folder. Exiting...");
 
         System.out.println("########################## STATS ##############################\n");
 
@@ -245,21 +246,4 @@ public abstract class CollectionProcessor {
         else FileUtils.cleanDirectory(folder);
     }
 
-    /**
-     * Returns an ArrayList which contains the parameters required for the execution. It contains folder paths or file names.
-     * @return ArrayList with the parameters
-     * @throws IOException
-     */
-    private static ArrayList<String> loadParameters() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(new File("conf.data")));
-
-        ArrayList<String> params = new ArrayList<>();
-
-        String param;
-        while ((param = br.readLine()) != null ){
-            params.add(param);
-        }
-
-        return params;
-    }
 }

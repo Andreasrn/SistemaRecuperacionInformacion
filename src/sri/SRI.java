@@ -3,12 +3,16 @@
  * @Author: Andrea Serrano Urea
  */
 package sri;
-
+import org.jsoup.nodes.Document;
 import queryprocessor.QueryProcessor;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.lang.reflect.Parameter;
+import java.io.FileReader;
+import java.io.IOException;
+
 import java.util.*;
+import org.jsoup.Jsoup;
 
 
 
@@ -20,7 +24,11 @@ public class SRI {
      */
 
     public static void main(String[] args) throws Exception {
-        Boolean indexExist = false;
+
+
+        ArrayList<String> params = loadParameters();
+        int STOPWORDS_FILE = 0, DOCUMENTS_FOLDER = 1, PROCESSED_FOLDER = 2, STOPPER_FOLDER = 3, STEMMER_FOLDER = 4, RELEVANT_DOCS = 5;
+
         Scanner scan = new Scanner(System.in);
         String option;
         String query;
@@ -42,11 +50,15 @@ public class SRI {
 
                     if (option.equals("y")){
                         index.delete();
-                        CollectionProcessor.processCollection();
+                        CollectionProcessor.processCollection(params.get(STOPWORDS_FILE),params.get(DOCUMENTS_FOLDER),
+                                                              params.get(PROCESSED_FOLDER),params.get(STEMMER_FOLDER),
+                                                              params.get(STOPPER_FOLDER));
                     }
 
                 } else {
-                    CollectionProcessor.processCollection();
+                    CollectionProcessor.processCollection(params.get(STOPWORDS_FILE),params.get(DOCUMENTS_FOLDER),
+                                                           params.get(PROCESSED_FOLDER),params.get(STEMMER_FOLDER),
+                                                           params.get(STOPPER_FOLDER));
                 }
 
             } else if (option.equals("2")){
@@ -58,14 +70,14 @@ public class SRI {
                 HashMap<String,Double> queryWeights = qp.calculateWeights(query);
 
                 PriorityQueue<Pair<String,Double>> retrievedDocs = qp.calculateSimilarity(queryWeights);
-                int numDocs =  retrievedDocs.size();
+
                 Pair<String,Double> doc;
 
                 System.out.println("Results:");
 
-                for (int i = 0; i < numDocs; i++){
+                for (int i = 0; i < Integer.parseInt(params.get(RELEVANT_DOCS)); i++){
                     doc = retrievedDocs.poll();
-                    System.out.printf("%s -> %s\n",doc.getFirst(),doc.getSecond());
+                    printResult(i+1,doc);
                 }
 
 
@@ -75,6 +87,44 @@ public class SRI {
 
 
 
+    }
+
+    /**
+     * Returns an ArrayList which contains the parameters required for the execution. It contains folder paths or file names.
+     * @return ArrayList with the parameters
+     * @throws IOException
+     */
+    private static ArrayList<String> loadParameters() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File("conf.data")));
+
+        ArrayList<String> params = new ArrayList<>();
+
+        String param;
+        while ((param = br.readLine()) != null ){
+            params.add(param);
+        }
+
+        return params;
+    }
+
+
+    /**
+     * It shows on the screen info about the document retrieved.
+     * @param num
+     * @param document
+     */
+    private static void printResult(int num, Pair<String,Double> document){
+
+        //Document text = Jsoup.parse(document.getFirst());
+
+        System.out.printf("Document #%d.\n", num);
+        System.out.printf("\tSimilarity: %s %% \n",document.getSecond()*100);
+
+
+
+        System.out.printf("\t<Título del documento>\n");
+        System.out.printf("\t<Frase que contiene la consulta>\n");
+        System.out.println();
     }
 
 }

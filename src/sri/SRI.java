@@ -4,12 +4,11 @@
  */
 package sri;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import queryprocessor.QueryProcessor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 import java.util.*;
 import org.jsoup.Jsoup;
@@ -77,7 +76,7 @@ public class SRI {
 
                 for (int i = 0; i < Integer.parseInt(params.get(RELEVANT_DOCS)); i++){
                     doc = retrievedDocs.poll();
-                    printResult(i+1,doc);
+                    printResult(i+1,doc,params.get(DOCUMENTS_FOLDER));
                 }
 
 
@@ -110,21 +109,31 @@ public class SRI {
 
     /**
      * It shows on the screen info about the document retrieved.
-     * @param num
-     * @param document
+     * @param num num of document
+     * @param document Pair containing the name of the doc and similarity with the query
+     * @param path path where original files are stored
      */
-    private static void printResult(int num, Pair<String,Double> document){
+    private static void printResult(int num, Pair<String,Double> document, String path) throws IOException {
 
-        //Document text = Jsoup.parse(document.getFirst());
+        FileReader r = new FileReader(new File(path+"/"+document.getFirst().replace(".txt",".html")));
+        BufferedReader br = new BufferedReader(r);
+
+        String line;
+        String text = "";
+        while ( (line=br.readLine()) != null) {
+            text += line;
+        }
+
+        Document html = Jsoup.parse(text);
 
         System.out.printf("Document #%d.\n", num);
         System.out.printf("\tSimilarity: %s %% \n",document.getSecond()*100);
 
 
+        System.out.printf("\t%s\n",html.title());
 
-        System.out.printf("\t<Título del documento>\n");
         System.out.printf("\t<Frase que contiene la consulta>\n");
-        System.out.println();
+
     }
 
 }

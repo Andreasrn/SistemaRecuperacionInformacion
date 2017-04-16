@@ -75,7 +75,11 @@ public class SRI {
 
                 System.out.println("Results:");
 
-                for (int i = 0; i < Integer.parseInt(params.get(RELEVANT_DOCS)); i++){
+                int numDocuments = Integer.parseInt(params.get(RELEVANT_DOCS));
+
+                if (numDocuments > retrievedDocs.size()) numDocuments = retrievedDocs.size();
+
+                for (int i = 0; i < numDocuments; i++){
                     doc = retrievedDocs.poll();
                     printResult(i+1,doc,params.get(DOCUMENTS_FOLDER),query);
 
@@ -132,11 +136,11 @@ public class SRI {
         System.out.printf("\tSimilarity: %s %% \n",document.getSecond()*100);
 
 
-        System.out.printf("\t%s\n",html.title());
+        System.out.printf("\tTitle: %s\n",html.title());
 
         System.out.println();
 
-        System.out.printf("\t%s\n", lookForSentenceWhichContains(query.split("\\s"),"documents/"+document.getFirst().replace(".txt",".html")));
+        System.out.printf("\tSentence: %s\n", lookForSentenceWhichContains(query.split("\\s"),"documents/"+document.getFirst().replace(".txt",".html")));
 
     }
 

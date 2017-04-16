@@ -168,30 +168,36 @@ public class SRI {
 
         documentText = Jsoup.parse(documentText).text();
 
-        documentText = documentText.toLowerCase();
-
-        documentText = StringUtils.stripAccents(documentText);
-
-        documentText = documentText.replaceAll("[^a-z0-9-._\\n]", " ");
-
         String[] listOfSentences = documentText.split("\\.");
+        HashMap<String,String> originalToNormalized = new HashMap<>();
+        String original;
 
+        for (String sentence: listOfSentences){
+
+            original = sentence;
+
+            sentence = sentence.toLowerCase();
+            sentence = StringUtils.stripAccents(sentence);
+            sentence = sentence.replaceAll("[^a-z0-9-._\\n]", " ");
+
+            originalToNormalized.put(original,sentence);
+        }
 
         int matches, maxMatches = 0;
         String output = "";
 
-        for (String sentence: listOfSentences){
+        for (Map.Entry<String,String> sentence: originalToNormalized.entrySet()){
 
             matches = 0;
 
             for (String word: words){
-                if (sentence.contains(word)) matches++;
+                if (sentence.getValue().contains(word)) matches++;
             }
 
-            if (matches == words.length) return sentence;
+            if (matches == words.length) return sentence.getKey();
             if (matches > maxMatches){
                 maxMatches = matches;
-                output = sentence;
+                output = sentence.getKey();
             }
         }
 

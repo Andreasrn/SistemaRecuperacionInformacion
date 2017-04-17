@@ -133,7 +133,8 @@ public class SRI {
         Document html = Jsoup.parse(text);
 
         System.out.printf("Document #%d.\n", num);
-        System.out.printf("\tSimilarity: %s %% \n",document.getSecond()*100);
+        if (document.getSecond().isNaN()) System.out.printf("\tSimilarity: Not avaiable\n");
+        else System.out.printf("\tSimilarity: %s %% \n",document.getSecond()*100);
 
 
         System.out.printf("\tTitle: %s\n",html.title());

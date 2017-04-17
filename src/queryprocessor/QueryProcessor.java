@@ -157,6 +157,10 @@ public class QueryProcessor {
             for (String wordInQuery: queryWeights.keySet()){
                 if (index.containsKey(wordInQuery)){
                     if (index.get(wordInQuery).getSecond().containsKey(doc)){
+
+                        //System.out.println(index.get(wordInQuery).getSecond().get(doc));
+                        //System.out.println(queryWeights.get(wordInQuery));
+
                         numerator += (index.get(wordInQuery).getSecond().get(doc) * queryWeights.get(wordInQuery));
 
                         sumDocWeights += Math.pow(index.get(wordInQuery).getSecond().get(doc),2);

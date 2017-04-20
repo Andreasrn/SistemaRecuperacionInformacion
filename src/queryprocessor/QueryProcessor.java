@@ -117,6 +117,7 @@ public class QueryProcessor {
         }
 
         System.out.println("Weights calculated.");
+        Double s = index.get("univers").getFirst();
         return weights;
 
     }
@@ -158,9 +159,6 @@ public class QueryProcessor {
                 if (index.containsKey(wordInQuery)){
                     if (index.get(wordInQuery).getSecond().containsKey(doc)){
 
-                        //System.out.println(index.get(wordInQuery).getSecond().get(doc));
-                        //System.out.println(queryWeights.get(wordInQuery));
-
                         numerator += (index.get(wordInQuery).getSecond().get(doc) * queryWeights.get(wordInQuery));
 
                         sumDocWeights += Math.pow(index.get(wordInQuery).getSecond().get(doc),2);
@@ -172,7 +170,8 @@ public class QueryProcessor {
 
             sumDocWeights = Math.sqrt(sumDocWeights);
 
-            if (numerator != 0 && sumDocWeights != 0) output.offer(new Pair<>(doc, numerator / (sumDocWeights*sumQueryWeights)));
+            if (sumDocWeights != 0 && !Double.isNaN(numerator) && !Double.isNaN(sumDocWeights)) output.offer(new Pair<>(doc, numerator / (sumDocWeights*sumQueryWeights)));
+            else output.offer(new Pair<>(doc,0.0));
 
 
         }

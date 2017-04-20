@@ -104,7 +104,12 @@ public class Index {
 
             for (Map.Entry<String, Double> entry2 : entry.getValue().entrySet()) {
                 entry2.setValue(entry2.getValue()/maxFreq);
-                indexByWords.get(entry2.getKey()).put(entry.getKey(),entry2.getValue());
+                if (!Double.isNaN(entry2.getValue())){
+                    indexByWords.get(entry2.getKey()).put(entry.getKey(),entry2.getValue());
+                } else {
+                    indexByWords.get(entry2.getKey()).put(entry.getKey(),0.0);
+                }
+
             }
         }
 
@@ -173,11 +178,17 @@ public class Index {
 
         for (Map.Entry<String,HashMap<String,Double>> word: indexByWords.entrySet()){
 
+            if (word.getKey().equals("mund")) System.out.println("MUND");
+
             df = word.getValue().entrySet().size();
 
             idf = (float) Math.log10(NUM_DOCS/df);
 
+            if (word.getKey().equals("mund")) System.out.println("IDF: "+idf);
+
             weights.put(word.getKey(),new Pair(idf, new HashMap<>()));
+
+            if (word.getKey().equals("mund")) System.out.println("Peso: "+weights.get(word.getKey()).getFirst());
 
             sumCuadrado = 0;
 
@@ -187,13 +198,24 @@ public class Index {
                 sumCuadrado += Math.pow(weights.get(word.getKey()).getSecond().get(document.getKey()),2);
             }
 
+            if (word.getKey().equals("mund")) System.out.println("Suma cuadrado: "+sumCuadrado);
+
             norma = (float) Math.sqrt(sumCuadrado);
 
 
-            for (Map.Entry<String,Double> document: word.getValue().entrySet()){
-                weights.get(word.getKey()).getSecond().put(document.getKey(),weights.get(word.getKey()).getSecond().get(document.getKey())/norma);
+            if (!Double.isNaN(norma)){
+                for (Map.Entry<String,Double> document: word.getValue().entrySet()){
+                    weights.get(word.getKey()).getSecond().put(document.getKey(),weights.get(word.getKey()).getSecond().get(document.getKey())/norma);
 
+                }
+            } else {
+                for (Map.Entry<String,Double> document: word.getValue().entrySet()){
+                    if (Double.isNaN(norma)) norma = 0;
+                    weights.get(word.getKey()).getSecond().put(document.getKey(),0.0);
+
+                }
             }
+
 
         }
 

@@ -78,6 +78,7 @@ public class SRI {
                 int numDocuments = Integer.parseInt(params.get(RELEVANT_DOCS));
 
                 if (numDocuments > retrievedDocs.size()) numDocuments = retrievedDocs.size();
+                if (retrievedDocs.size() == 0) System.out.println("No documents were found.");
 
                 for (int i = 0; i < numDocuments; i++){
                     doc = retrievedDocs.poll();

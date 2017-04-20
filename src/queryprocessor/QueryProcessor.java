@@ -171,7 +171,6 @@ public class QueryProcessor {
             sumDocWeights = Math.sqrt(sumDocWeights);
 
             if (sumDocWeights != 0 && !Double.isNaN(numerator) && !Double.isNaN(sumDocWeights)) output.offer(new Pair<>(doc, numerator / (sumDocWeights*sumQueryWeights)));
-            else output.offer(new Pair<>(doc,0.0));
 
 
         }

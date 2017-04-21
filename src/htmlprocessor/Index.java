@@ -178,17 +178,11 @@ public class Index {
 
         for (Map.Entry<String,HashMap<String,Double>> word: indexByWords.entrySet()){
 
-            if (word.getKey().equals("mund")) System.out.println("MUND");
-
             df = word.getValue().entrySet().size();
 
-            idf = (float) Math.log10(NUM_DOCS/df);
-
-            if (word.getKey().equals("mund")) System.out.println("IDF: "+idf);
+            idf = Math.log10( (double) NUM_DOCS/df);
 
             weights.put(word.getKey(),new Pair(idf, new HashMap<>()));
-
-            if (word.getKey().equals("mund")) System.out.println("Peso: "+weights.get(word.getKey()).getFirst());
 
             sumCuadrado = 0;
 
@@ -218,6 +212,8 @@ public class Index {
 
 
         }
+
+        int a = 0;
 
 
    }

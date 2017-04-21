@@ -34,9 +34,16 @@ public class QueryProcessor {
 
         ClaseSerializable<HashMap<String, Pair<Double,HashMap<String,Double>>>> indexFile = new ClaseSerializable<>();
 
-        System.out.print("Loading index...\n");
-        index = indexFile.leerObjeto("index.obj");
-        System.out.print("Index loaded.\n");
+        File i = new File("index.obj");
+        if (i.exists()){
+            System.out.print("Loading index...\n");
+            index = indexFile.leerObjeto("index.obj");
+
+            System.out.print("Index loaded.\n");
+        } else {
+            System.out.println("There is no index.");
+        }
+
 
 
     }

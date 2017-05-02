@@ -120,9 +120,18 @@ public class QueryProcessor {
                 weights.put(word.getKey(), 0.0);
             }
 
-
         }
 
+        double sum = 0;
+        for (Map.Entry<String,Double> weight: weights.entrySet()){
+            sum += Math.pow(weight.getValue(),2);
+        }
+
+        sum = Math.sqrt(sum);
+
+        for (Map.Entry<String,Double> weight: weights.entrySet()){
+            weights.put(weight.getKey(),weight.getValue()/sum);
+        }
         System.out.println("Weights calculated.");
         Double s = index.get("univers").getFirst();
         return weights;
@@ -166,9 +175,11 @@ public class QueryProcessor {
                 if (index.containsKey(wordInQuery)){
                     if (index.get(wordInQuery).getSecond().containsKey(doc)){
 
-                        numerator += (index.get(wordInQuery).getSecond().get(doc) * queryWeights.get(wordInQuery));
-
-                        sumDocWeights += Math.pow(index.get(wordInQuery).getSecond().get(doc),2);
+                        double aux = index.get(wordInQuery).getSecond().get(doc) * queryWeights.get(wordInQuery);
+                        if (!Double.isNaN(aux)){
+                            numerator += aux;
+                            sumDocWeights += Math.pow(index.get(wordInQuery).getSecond().get(doc),2);
+                        }
                     }
                 }
 

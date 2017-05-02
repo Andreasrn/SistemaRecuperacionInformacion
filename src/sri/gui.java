@@ -7,11 +7,20 @@ package sri;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFormattedTextField;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import queryprocessor.QueryProcessor;
 
 /**
  *
@@ -46,8 +55,9 @@ public class gui extends javax.swing.JFrame {
         else jPanel1.setVisible(false);
         jLabel4 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
         jButton2 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -76,22 +86,27 @@ public class gui extends javax.swing.JFrame {
             }
         });
 
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(32, 32, 32)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jFormattedTextField1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(32, 32, 32)
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(27, 27, 27)
-                        .addComponent(jButton2)
-                        .addGap(0, 34, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jButton2))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)))
+                .addGap(29, 29, 29))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,8 +116,8 @@ public class gui extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2))
-                .addGap(18, 18, 18)
-                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -159,7 +174,7 @@ public class gui extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             ArrayList<String> parameters = loadParameters();
-            
+
             CollectionProcessor.processCollection(parameters.get(0),
                     parameters.get(1),
                     parameters.get(2),
@@ -179,8 +194,189 @@ public class gui extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String query = jTextField1.getText();
-        
+
+        try {
+            QueryProcessor qp = new QueryProcessor("StopWords.txt");
+
+            query = qp.processQuery(query);
+
+            HashMap<String, Double> queryWeights = qp.calculateWeights(query);
+
+            PriorityQueue<Pair<String, Double>> retrievedDocs = qp.calculateSimilarity(queryWeights);
+
+            //Launch again the query
+            for (int i = 0; i < 5; i++) {
+                String path = "stemmer/" + retrievedDocs.poll().getFirst();
+
+                ArrayList<sri.Pair<String, Integer>> words = mostFrequentWords(path);
+
+                for (sri.Pair<String, Integer> word : words) {
+                    query += word.getFirst() + " ";
+                }
+            }
+
+            query = qp.processQuery(query);
+
+            HashMap<String, Double> newQueryWeights = qp.calculateWeights(query);
+
+            PriorityQueue<Pair<String, Double>> newRetrievedDocs = qp.calculateSimilarity(newQueryWeights);
+
+            Pair<String, Double> doc;
+
+            System.out.println("Results:");
+
+            ArrayList<String> param = loadParameters();
+
+            int numDocuments = Integer.parseInt(param.get(5));
+
+            if (numDocuments > retrievedDocs.size()) {
+                numDocuments = newRetrievedDocs.size();
+            }
+            if (newRetrievedDocs.size() == 0) {
+                jTextArea1.setText("No se han encontrado documentos");
+            }
+            
+            String totalResult = "";
+            for (int i = 0; i < numDocuments; i++) {
+                doc = newRetrievedDocs.poll();
+                String result = printResult(i + 1, doc, param.get(1), query);
+                
+                totalResult += result += "\n";
+                
+
+            }
+            
+            jTextArea1.setText(totalResult);
+
+        } catch (IOException ex) {
+            Logger.getLogger(gui.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(gui.class.getName()).log(Level.SEVERE, null, ex);
+        } catch(Exception e){
+            jTextArea1.setText("No hay documentos relevantes para la consulta");
+        }
+
     }//GEN-LAST:event_jButton2ActionPerformed
+    private String printResult(int num, Pair<String, Double> document, String path, String query) throws IOException {
+
+        FileReader r = new FileReader(new File(path + "/" + document.getFirst().replace(".txt", ".html")));
+        BufferedReader br = new BufferedReader(r);
+
+        String line;
+        String text = "";
+        while ((line = br.readLine()) != null) {
+            text += line;
+        }
+
+        Document html = Jsoup.parse(text);
+        
+        String output = "";
+        
+        output += "Document #"+num+".\n\tSimilarity: "+document.getSecond()*100+
+                "%"+"\n\tTitle: "+html.title()+"\n\tSentence: "
+                +lookForSentenceWhichContains(query.split("\\s"),"documents/" + document.getFirst().replace(".txt", ".html"));
+        
+        return output;
+
+
+    }
+
+    private static String lookForSentenceWhichContains(String[] words, String documentPath) throws IOException {
+
+        File document = new File(documentPath);
+
+        if (!document.exists()) {
+            throw new FileNotFoundException("File located at " + documentPath + " doesn't exist.\n");
+        }
+
+        FileReader r = new FileReader(document);
+        BufferedReader br = new BufferedReader(r);
+
+        String line;
+        String documentText = "";
+        while ((line = br.readLine()) != null) {
+            documentText += line;
+        }
+
+        documentText = Jsoup.parse(documentText).text();
+
+        String[] listOfSentences = documentText.split("\\.");
+        HashMap<String, String> originalToNormalized = new HashMap<>();
+        String original;
+
+        for (String sentence : listOfSentences) {
+
+            original = sentence;
+
+            sentence = sentence.toLowerCase();
+            sentence = StringUtils.stripAccents(sentence);
+            sentence = sentence.replaceAll("[^a-z0-9-._\\n]", " ");
+
+            originalToNormalized.put(original, sentence);
+        }
+
+        int matches, maxMatches = 0;
+        String output = "";
+
+        for (Map.Entry<String, String> sentence : originalToNormalized.entrySet()) {
+
+            matches = 0;
+
+            for (String word : words) {
+                if (sentence.getValue().contains(word)) {
+                    matches++;
+                }
+            }
+
+            if (matches == words.length) {
+                return sentence.getKey();
+            }
+            if (matches > maxMatches) {
+                maxMatches = matches;
+                output = sentence.getKey();
+            }
+        }
+
+        return output;
+
+    }
+
+    private static ArrayList<sri.Pair<String, Integer>> mostFrequentWords(String path) throws IOException {
+        PriorityQueue<Pair<String, Integer>> listOfWords = new PriorityQueue<>(10, (o1, o2) -> {
+            return ((int) o2.getSecond() - (int) o1.getSecond());
+        });
+
+        HashMap<String, Integer> mapOfWords = new HashMap<>();
+
+        BufferedReader br;
+        String word;
+        ArrayList outputList = new ArrayList();
+
+        File file = new File(path);
+
+        br = new BufferedReader(new FileReader(file));
+
+        while ((word = br.readLine()) != null) {
+            if (mapOfWords.containsKey(word)) {
+                mapOfWords.put(word, mapOfWords.get(word) + 1);
+            } else {
+                mapOfWords.put(word, 1);
+            }
+        }
+
+        for (Map.Entry<String, Integer> entry : mapOfWords.entrySet()) {
+            sri.Pair<String, Integer> tuple = new sri.Pair<String, Integer>(entry.getKey(), entry.getValue());
+            listOfWords.offer(tuple);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            outputList.add(new sri.Pair<String, Integer>(listOfWords.peek().getFirst(), listOfWords.poll().getSecond()));
+        }
+
+        return outputList;
+
+    }
+
     private static ArrayList<String> loadParameters() throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(new File("conf.data")));
 
@@ -232,12 +428,13 @@ public class gui extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

@@ -71,18 +71,40 @@ public class SRI {
 
                 PriorityQueue<Pair<String,Double>> retrievedDocs = qp.calculateSimilarity(queryWeights);
 
+                //Launch again the query
+
+
+                String newQuery = "";
+
+                for (int i = 0; i < 5; i++){
+                    String path = "stemmer/"+retrievedDocs.poll().getFirst();
+
+                    ArrayList<sri.Pair<String,Integer>> words = mostFrequentWords(path);
+
+                    for (sri.Pair<String,Integer> word: words){
+                        newQuery += word.getFirst() + " ";
+                    }
+                }
+
+                newQuery = qp.processQuery(newQuery);
+
+                HashMap<String,Double> newQueryWeights = qp.calculateWeights(newQuery);
+
+                PriorityQueue<Pair<String,Double>> newRetrievedDocs = qp.calculateSimilarity(newQueryWeights);
+
+
                 Pair<String,Double> doc;
 
                 System.out.println("Results:");
 
                 int numDocuments = Integer.parseInt(params.get(RELEVANT_DOCS));
 
-                if (numDocuments > retrievedDocs.size()) numDocuments = retrievedDocs.size();
-                if (retrievedDocs.size() == 0) System.out.println("No documents were found.");
+                if (numDocuments > retrievedDocs.size()) numDocuments = newRetrievedDocs.size();
+                if (newRetrievedDocs.size() == 0) System.out.println("No documents were found.");
 
                 for (int i = 0; i < numDocuments; i++){
-                    doc = retrievedDocs.poll();
-                    printResult(i+1,doc,params.get(DOCUMENTS_FOLDER),query);
+                    doc = newRetrievedDocs.poll();
+                    printResult(i+1,doc,params.get(DOCUMENTS_FOLDER),newQuery);
 
                 }
 
@@ -204,6 +226,48 @@ public class SRI {
         }
 
         return output;
+
+    }
+
+    /**
+     * Returns the 5 most frequent words in a given collection
+     * @param path path where the documents are stored
+     * @return array with the most frequent words
+     */
+    private static ArrayList<sri.Pair<String,Integer>> mostFrequentWords(String path) throws IOException {
+        PriorityQueue<Pair<String, Integer>> listOfWords = new PriorityQueue<>(10,(o1, o2) -> {
+            return ((int) o2.getSecond() - (int) o1.getSecond());
+        });
+
+        HashMap<String,Integer> mapOfWords = new HashMap<>();
+
+        BufferedReader br;
+        String word;
+        ArrayList outputList = new ArrayList();
+
+        File file = new File(path);
+
+        br = new BufferedReader(new FileReader(file));
+
+        while ( (word = br.readLine()) != null) {
+            if (mapOfWords.containsKey(word)) {
+                mapOfWords.put(word, mapOfWords.get(word) + 1);
+            } else {
+                mapOfWords.put(word, 1);
+            }
+        }
+
+        for (Map.Entry<String,Integer> entry: mapOfWords.entrySet()){
+            sri.Pair<String,Integer> tuple = new sri.Pair<String,Integer>(entry.getKey(),entry.getValue());
+            listOfWords.offer(tuple);
+        }
+
+        for (int i = 0; i < 5; i++){
+            outputList.add(new sri.Pair<String,Integer>(listOfWords.peek().getFirst(),listOfWords.poll().getSecond()));
+        }
+
+        return outputList;
+
 
     }
 
